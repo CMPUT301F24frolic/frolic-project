@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1030646823778",
+    "project_id": "frolic-925b1",
+    "storage_bucket": "frolic-925b1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1030646823778:android:be5bec57ab03934c774a3b",
+        "android_client_info": {
+          "package_name": "com.example.frolic"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2V0UVx6kipyboGZh3exQNDBlFZ51E7tk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

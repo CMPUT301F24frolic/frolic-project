@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -32,7 +33,16 @@ android {
 }
 
 dependencies {
-
+    implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
+    implementation("com.google.firebase:firebase-firestore")
+    // Firebase Authentication
+    implementation("com.google.firebase:firebase-auth")
+    // Firebase Cloud Messaging (FCM) for push notifications
+    implementation("com.google.firebase:firebase-messaging")
+    // Firebase Storage for storing event posters
+    implementation("com.google.firebase:firebase-storage")
+    // Firebase Analytics
+    implementation("com.google.firebase:firebase-analytics")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
