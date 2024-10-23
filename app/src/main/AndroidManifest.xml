@@ -23,4 +23,7 @@
         </activity>
     </application>
 
+    <receiver android:name=".LotteryAlarmReceiver" android:exported="true"/>
+
+
 </manifest>

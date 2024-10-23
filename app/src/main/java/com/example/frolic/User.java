@@ -9,7 +9,7 @@ public class User {
     private ArrayList<Event> eventsEntered;
     private Facility facility = null;
     private boolean admin = false;
-    // Set users to not be admins by default lol
+    private boolean notifications = false;
 
     /*
      * This constructor takes in no parameters and sets a default User.
@@ -115,4 +115,11 @@ public class User {
     }
 
 
+    public boolean getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(boolean notifications) {
+        this.notifications = notifications;
+    }
 }
