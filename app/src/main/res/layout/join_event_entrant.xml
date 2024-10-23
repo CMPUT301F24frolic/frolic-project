@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+
+    <!-- Event date and price -->
+
+    <TextView
+        android:id="@+id/tvEventDateFormat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="16dp"
+        android:text="YYYY/MM/DD"
+        android:textColor="#FF8473"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/tvDetails"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvEventDate"
+        app:layout_constraintVertical_bias="0.191" />
+
+    <LinearLayout
+        android:id="@+id/linearDatePrice"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </LinearLayout>
+
+    <!-- Details Text -->
+
+    <!-- Description -->
+
+    <!-- Read more button -->
+
+    <TextView
+        android:id="@+id/tvDetails"
+        android:layout_width="379dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="364dp"
+        android:layout_marginEnd="32dp"
+        android:text="Details"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- People in Waiting List -->
+
+    <!-- Placeholder for people avatars -->
+
+    <!-- Join Waiting List Button -->
+
+    <TextView
+        android:id="@+id/tvDescription"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:text="Event details...."
+        android:textColor="#A9A9A9"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/btnJoinWaitingList"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvDetails"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/tvWaitingListTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="People in Waiting List"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/btnJoinWaitingList"
+        app:layout_constraintStart_toStartOf="@id/tvDescription"
+        app:layout_constraintTop_toBottomOf="@+id/tvDescription" />
+
+
+    <Button
+        android:id="@+id/btnJoinWaitingList"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:backgroundTint="#5DB075"
+        android:text="Join Waiting List!"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/tvEventDate"
+        android:layout_width="411dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:text="Event Date"
+        android:textColor="#FF8473"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/tvDetails"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.6" />
+
+    <TextView
+        android:id="@+id/tvEventPrice"
+        android:layout_width="46dp"
+        android:layout_height="17dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="333dp"
+        android:layout_marginTop="251dp"
+        android:text="$00"
+        android:textColor="#FF8473"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/tvDetails"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/WaitingListNumber"
+        android:layout_width="102dp"
+        android:layout_height="32dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/btnJoinWaitingList"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.051"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvWaitingListTitle"
+        app:layout_constraintVertical_bias="0.311" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
