@@ -19,7 +19,7 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="420dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
