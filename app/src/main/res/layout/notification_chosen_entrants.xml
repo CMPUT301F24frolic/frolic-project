@@ -19,7 +19,7 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="420dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
@@ -28,40 +28,40 @@
                 android:id="@+id/tvCongrats"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:text="Congratulations!"
-                android:textSize="24sp"
-                android:textStyle="bold"
                 android:textColor="@android:color/black"
-                android:gravity="center"/>
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvMessage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="You were Picked in the Lottery!"
-                android:textSize="16sp"
-                android:textColor="@android:color/black"
+                android:layout_marginTop="8dp"
                 android:gravity="center"
-                android:layout_marginTop="8dp"/>
+                android:text="You were Picked in the Lottery!"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
 
             <Button
                 android:id="@+id/btnAcceptInvitation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Accept invitation"
-                android:backgroundTint="#5DB075"
-                android:textColor="@android:color/white"
+                android:layout_gravity="center"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
-                android:layout_gravity="center"/>
+                android:backgroundTint="#5DB075"
+                android:text="Accept invitation"
+                android:textColor="@android:color/white" />
 
             <Button
                 android:id="@+id/btnRejectInvitation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:text="Reject Invitation"
-                android:textColor="#82B96D"
-                android:layout_gravity="center"/>
+                android:textColor="#82B96D" />
 
         </LinearLayout>
 
