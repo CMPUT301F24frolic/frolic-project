@@ -4,32 +4,34 @@ import java.util.Collections;
 
 import android.util.Log;
 
+import com.google.firebase.firestore.auth.User;
+
 public class LotterySystem {
     private Event event;
-    private ArrayList<User> waitingList;
-    private ArrayList<User> invitedList;
-    private ArrayList<User> confirmedList;
+    private ArrayList<Entrant> waitingList;
+    private ArrayList<Entrant> invitedList;
+    private ArrayList<Entrant> confirmedList;
     private int maxAttendees;
     private int maxWaiting;
 
     // TODO: Add Javadocs
 
     public LotterySystem() {
-        waitingList = new ArrayList<User>();
-        invitedList = new ArrayList<User>();
-        confirmedList = new ArrayList<User>();
+        waitingList = new ArrayList<Entrant>();
+        invitedList = new ArrayList<Entrant>();
+        confirmedList = new ArrayList<Entrant>();
     }
 
     public LotterySystem(Event event, int maxAttendees, int maxConfirmed) {
         this.event = event;
         this.maxAttendees = maxAttendees;
         this.maxWaiting = maxConfirmed;
-        waitingList = new ArrayList<User>();
-        invitedList = new ArrayList<User>();
-        confirmedList = new ArrayList<User>();
+        waitingList = new ArrayList<Entrant>();
+        invitedList = new ArrayList<Entrant>();
+        confirmedList = new ArrayList<Entrant>();
     }
 
-    public ArrayList<User> drawLottery() {
+    public ArrayList<Entrant> drawLottery() {
         Collections.shuffle(waitingList);
         for (int i = 0; i < Math.min(waitingList.size(), maxAttendees); i++) {
             invitedList.add(waitingList.get(i));
@@ -40,32 +42,32 @@ public class LotterySystem {
 
     // TODO: Add method that notifies users when they've been drawn for the lottery
 
-    public boolean addToWaitingList(User user) {
+    public boolean addToWaitingList(Entrant entrant) {
         try { assert waitingList.size() + 1 <= maxWaiting; }
-        catch (AssertionError e) { Log.e("LotterySystem.java", "Tried to add a user greater than the max size of the entrant list.", e); }
-        return waitingList.add(user);
+        catch (AssertionError e) { Log.e("LotterySystem.java", "Tried to add an Entrant greater than the max size of the entrant list.", e); }
+        return waitingList.add(entrant);
     }
 
-    public boolean removeFromWaitingList(User user) {
-        try { assert waitingList.contains(user); }
+    public boolean removeFromWaitingList(Entrant entrant) {
+        try { assert waitingList.contains(entrant); }
         catch (AssertionError e) { Log.e("LotterySystem.java", "Tried to remove a user that doesn't exist form the waiting list", e); }
-        return waitingList.remove(user);
+        return waitingList.remove(entrant);
     }
 
-    public ArrayList<User> getWaitingList() {
+    public ArrayList<Entrant> getWaitingList() {
         return waitingList;
     }
 
-    public void setWaitingList(ArrayList<User> waitingList) {
+    public void setWaitingList(ArrayList<Entrant> waitingList) {
         this.waitingList = waitingList;
     }
 
 
-    public ArrayList<User> getConfirmedList() {
+    public ArrayList<Entrant> getConfirmedList() {
         return confirmedList;
     }
 
-    public void setConfirmedList(ArrayList<User> confirmedList) {
+    public void setConfirmedList(ArrayList<Entrant> confirmedList) {
         this.confirmedList = confirmedList;
     }
 

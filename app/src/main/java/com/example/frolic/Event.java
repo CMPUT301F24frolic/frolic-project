@@ -1,44 +1,30 @@
 package com.example.frolic;
 import android.util.Log;
+
+import com.google.firebase.firestore.auth.User;
+
 import java.util.Date;
 
 import java.util.ArrayList;
 
 public class Event {
-    private User organizer;
+    private Organizer organizer;
     private String eventName;
     private String eventDesc;
-    private ArrayList<User> confirmed;
+    private ArrayList<Entrant> confirmed;
     private Facility facility;
     private int maxEntrants;
     private int maxConfirmed;
     private Date eventDate;
     private Date enrollDate;
-    private LotterySystem lottery;
+    private final LotterySystem lottery;
 
-    /*
-     * This constructor takes in no parameters and sets a default Event.
-     * Note that facilities need to have an owner, so one is provided.
-     */
-    public Event() {
-        organizer = new User();
-        eventName = "";
-        eventDesc = "";
-        facility = new Facility(organizer);
-        confirmed = new ArrayList<User>();
-        maxEntrants = 0;
-        maxConfirmed = 0;
-        eventDate = new Date();
-        enrollDate = new Date();
-        lottery = new LotterySystem(this, maxEntrants, maxConfirmed);
-    }
-
-    /*
+    /**
      * This constructor acts as the main method of creating an event.
      * Note that Facility is not provided as it should be a prerequisite to create one before starting an event.
      * I am assuming that the UI will prompt the user to create a facility when trying to create an event if they do not already have one.
      */
-    public Event(User organizer, String eventName, String eventDesc, int maxConfirmed, int maxEntrants, Date eventDate, Date enrollDate) {
+    public Event(Organizer organizer, String eventName, String eventDesc, int maxConfirmed, int maxEntrants, Date eventDate, Date enrollDate) {
         try { assert organizer.getFacility() != null; }
         catch (AssertionError e) { Log.e("Event.java", "Tried to create an event without a facility", e); }
 
@@ -56,21 +42,21 @@ public class Event {
 
     /**
      * This method adds an entrant to the entrant list.
-     * @param user
-     * This User will be added to the confirmed list in the event.
+     * @param entrant
+     * This Entrant will be added to the confirmed list in the event.
      */
-    public void addEntrant(User user) {
-        confirmed.add(user);
+    public void addEntrant(Entrant entrant) {
+        confirmed.add(entrant);
     }
 
     /**
      * This method removes an entrant from the confirmed list, if they exist
-     * @param user
+     * @param entrant
      * This user will be removed from the confirmed list if they are in it
      */
-    public boolean removeEntrant(User user) {
-        if (confirmed.contains(user)) {
-            return confirmed.remove(user);
+    public boolean removeEntrant(Entrant entrant) {
+        if (confirmed.contains(entrant)) {
+            return confirmed.remove(entrant);
         }
         Log.e("Event.java", "Tried to remove an entrant that doesn't exist in the list");
         return false;
@@ -80,11 +66,11 @@ public class Event {
     // Some of these may be redundant. Feel free to remove later if they seem that way
     // TODO: add Javadocs
 
-    public User getOrganizer() {
+    public Organizer getOrganizer() {
         return organizer;
     }
 
-    public void setOrganizer(User organizer) {
+    public void setOrganizer(Organizer organizer) {
         this.organizer = organizer;
     }
 
@@ -107,11 +93,11 @@ public class Event {
     }
     
 
-    public ArrayList<User> getConfirmed() {
+    public ArrayList<Entrant> getConfirmed() {
         return confirmed;
     }
 
-    public void setConfirmed(ArrayList<User> confirmed) {
+    public void setConfirmed(ArrayList<Entrant> confirmed) {
         this.confirmed = confirmed;
     }
 
