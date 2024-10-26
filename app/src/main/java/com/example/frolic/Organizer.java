@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 public class Organizer {
     private Identity identity;
-    private ArrayList<Event> eventsOrganizing;
+    private ArrayList<String> eventsOrganizing;  // Store event IDs instead of full Event objects for Firebase
     private Facility facility = null;
 
     /**
@@ -14,22 +14,26 @@ public class Organizer {
      */
     public Organizer(Identity identity) {
         this.identity = identity;
-        this.eventsOrganizing = new ArrayList<Event>();
+        this.eventsOrganizing = new ArrayList<>();
     }
 
     // Getters and Setters
     // Some of these may be redundant. Feel free to remove later if they seem that way
     // TODO: Add Javadocs
 
-    public void organizeEvent(Event event) {
-        eventsOrganizing.add(event);
+    public String getOrganizerId() {
+        return identity.getDeviceID();
     }
 
-    public ArrayList<Event> getEventsOrganizing() {
+    public void organizeEvent(String eventId) {
+        eventsOrganizing.add(eventId);
+    }
+
+    public ArrayList<String> getEventsOrganizing() {
         return eventsOrganizing;
     }
 
-    public void setEventsOrganizing(ArrayList<Event> eventsOrganizing) {
+    public void setEventsOrganizing(ArrayList<String> eventsOrganizing) {
         this.eventsOrganizing = eventsOrganizing;
     }
 

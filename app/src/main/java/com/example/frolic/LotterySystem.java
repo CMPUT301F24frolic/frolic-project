@@ -22,10 +22,10 @@ public class LotterySystem {
         confirmedList = new ArrayList<Entrant>();
     }
 
-    public LotterySystem(Event event, int maxAttendees, int maxConfirmed) {
+    public LotterySystem(Event event) {
         this.event = event;
-        this.maxAttendees = maxAttendees;
-        this.maxWaiting = maxConfirmed;
+        this.maxAttendees = event.getMaxConfirmed();
+        this.maxWaiting = event.getWaitlistLimit();
         waitingList = new ArrayList<Entrant>();
         invitedList = new ArrayList<Entrant>();
         confirmedList = new ArrayList<Entrant>();
@@ -43,9 +43,12 @@ public class LotterySystem {
     // TODO: Add method that notifies users when they've been drawn for the lottery
 
     public boolean addToWaitingList(Entrant entrant) {
-        try { assert waitingList.size() + 1 <= maxWaiting; }
-        catch (AssertionError e) { Log.e("LotterySystem.java", "Tried to add an Entrant greater than the max size of the entrant list.", e); }
-        return waitingList.add(entrant);
+        if (maxWaiting == -1 || waitingList.size() < maxWaiting) {
+            return waitingList.add(entrant);
+        } else {
+            Log.e("LotterySystem", "Waiting list is full. Entrant could not be added.");
+            return false;
+        }
     }
 
     public boolean removeFromWaitingList(Entrant entrant) {

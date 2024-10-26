@@ -1,43 +1,69 @@
 package com.example.frolic;
+import android.graphics.Bitmap;
 import android.util.Log;
-
-import com.google.firebase.firestore.auth.User;
 
 import java.util.Date;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Event {
-    private Organizer organizer;
+    private String eventId;
+    private String organizerId;
     private String eventName;
     private String eventDesc;
-    private ArrayList<Entrant> confirmed;
+    private ArrayList<Entrant> confirmed = new ArrayList<>();
     private Facility facility;
-    private int maxEntrants;
+    private int waitlistLimit;
     private int maxConfirmed;
     private Date eventDate;
     private Date enrollDate;
     private final LotterySystem lottery;
+    private double price;
+    private boolean geolocationRequired;
+    private boolean receiveNotification;
+    private String qrHash;
 
     /**
      * This constructor acts as the main method of creating an event.
      * Note that Facility is not provided as it should be a prerequisite to create one before starting an event.
      * I am assuming that the UI will prompt the user to create a facility when trying to create an event if they do not already have one.
      */
-    public Event(Organizer organizer, String eventName, String eventDesc, int maxConfirmed, int maxEntrants, Date eventDate, Date enrollDate) {
+    public Event(String eventId, Organizer organizer, String eventName, String eventDesc, int maxConfirmed, int waitlistLimit, Date eventDate, Date enrollDate, double price, boolean geolocationRequired, boolean receiveNotification, String qrHash) {
         try { assert organizer.getFacility() != null; }
         catch (AssertionError e) { Log.e("Event.java", "Tried to create an event without a facility", e); }
 
-        this.organizer = organizer;
+        this.eventId = eventId;
+        this.organizerId = organizer.getOrganizerId();
         this.eventName = eventName;
         this.eventDesc = eventDesc;
         this.maxConfirmed = maxConfirmed;
-        this.maxEntrants = maxEntrants;
+        this.waitlistLimit = waitlistLimit;
         this.facility = organizer.getFacility();
-
         this.eventDate = eventDate;
         this.enrollDate = enrollDate;
-        lottery = new LotterySystem(this, maxEntrants, maxConfirmed);
+        this.price = price;
+        this.geolocationRequired = geolocationRequired;
+        this.receiveNotification = receiveNotification;
+        this.qrHash = qrHash;
+        lottery = new LotterySystem(this);
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> eventMap = new HashMap<>();
+        eventMap.put("eventId", eventId);
+        eventMap.put("organizerId", organizerId);
+        eventMap.put("eventName", eventName);
+        eventMap.put("eventDesc", eventDesc);
+        eventMap.put("waitlistLimit", waitlistLimit);
+        eventMap.put("maxConfirmed", maxConfirmed);
+        eventMap.put("eventDate", eventDate);
+        eventMap.put("enrollDate", enrollDate);
+        eventMap.put("price", price);
+        eventMap.put("geolocationRequired", geolocationRequired);
+        eventMap.put("qrHash", qrHash);
+        return eventMap;
     }
 
     /**
@@ -62,18 +88,16 @@ public class Event {
         return false;
     }
 
+    /**
+     * Generates a QR code bitmap based on the event hash.
+     * @return A Bitmap containing the QR code, or null if generation fails.
+     */
+    public Bitmap getEventQRCode() { return QRCodeGenerator.generateQRCode(qrHash);}
+
+
     // Getters and Setters
     // Some of these may be redundant. Feel free to remove later if they seem that way
     // TODO: add Javadocs
-
-    public Organizer getOrganizer() {
-        return organizer;
-    }
-
-    public void setOrganizer(Organizer organizer) {
-        this.organizer = organizer;
-    }
-
 
     public String getEventName() {
         return eventName;
@@ -142,11 +166,35 @@ public class Event {
 
     // There is no setter for Lottery, as it is a composition of Event.
 
-    public int getMaxEntrants() {
-        return maxEntrants;
+    public int getWaitlistLimit() {
+        return waitlistLimit;
     }
 
-    public void setMaxEntrants(int maxEntrants) {
-        this.maxEntrants = maxEntrants;
+    public void setWaitlistLimit(int waitlistLimit) {
+        this.waitlistLimit = waitlistLimit;
+    }
+
+    public double getPrice() { return price; }
+
+    public void setPrice(double price) { this.price = price; }
+
+    public boolean isGeolocationRequired() { return geolocationRequired;}
+
+    public void setGeolocationRequired(boolean geolocationRequired) {this.geolocationRequired = geolocationRequired; }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public boolean isReceiveNotification() {
+        return receiveNotification;
+    }
+
+    public void setReceiveNotification(boolean receiveNotification) {
+        this.receiveNotification = receiveNotification;
+    }
+
+    public String getQrHash() {
+        return qrHash;
     }
 }

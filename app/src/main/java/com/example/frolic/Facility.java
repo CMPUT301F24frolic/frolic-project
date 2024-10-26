@@ -6,7 +6,6 @@ import java.util.ArrayList;
 public class Facility {
     private Organizer organizer;
     private String name;
-    private ArrayList<Event> events;
 
     /**
      * This constructor acts as the default constructor for Facility.
@@ -17,7 +16,6 @@ public class Facility {
     public Facility(Organizer organizer) {
         this.organizer = organizer;
         name = "";
-        events = organizer.getEventsOrganizing();
     }
 
     /**
@@ -30,7 +28,6 @@ public class Facility {
     public Facility(Organizer organizer, String name) {
         this.organizer = organizer;
         this.name = name;
-        events = organizer.getEventsOrganizing();
     }
 
     // Getters and Setters
@@ -45,7 +42,6 @@ public class Facility {
         this.organizer = organizer;
     }
 
-
     public String getName() {
         return name;
     }
@@ -53,15 +49,5 @@ public class Facility {
     public void setName(String name) {
         this.name = name;
     }
-
-
-    public ArrayList<Event> getEvents() {
-        return events;
-    }
-
-    public void setEvents(ArrayList<Event> events) {
-        this.events = events;
-    }
-
 
 }
