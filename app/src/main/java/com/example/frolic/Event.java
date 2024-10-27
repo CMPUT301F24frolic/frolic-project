@@ -50,6 +50,13 @@ public class Event {
         lottery = new LotterySystem(this);
     }
 
+    /**
+     * Converts the event's attributes into a map representation suitable for storage in Firebase.
+     * Each attribute is stored as a key-value pair, allowing for structured data storage in Firestore.
+     *
+     * @return a map containing the event's attributes, with attribute names as keys
+     *         and their respective values, formatted for Firebase storage
+     */
     public Map<String, Object> toMap() {
         Map<String, Object> eventMap = new HashMap<>();
         eventMap.put("eventId", eventId);
