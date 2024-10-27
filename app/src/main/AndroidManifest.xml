@@ -21,9 +21,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ListEventActivity" />
     </application>
 
-    <receiver android:name=".LotteryAlarmReceiver" android:exported="true"/>
 
 
 </manifest>

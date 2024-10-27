@@ -92,6 +92,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Vacancy"
+        android:inputType="number"
         android:layout_marginHorizontal="24dp"
         android:layout_marginTop="16dp"
         android:padding="12dp"
@@ -105,11 +106,37 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Price"
+        android:inputType="numberDecimal"
         android:layout_marginHorizontal="24dp"
         android:layout_marginTop="16dp"
         android:padding="12dp"
         android:background="@android:color/darker_gray"
         app:layout_constraintTop_toBottomOf="@id/etVacancy"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <EditText
+        android:id="@+id/etWaitlistLimit"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Max Waitlist Entrants (optional)"
+        android:inputType="number"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="16dp"
+        android:padding="12dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintTop_toBottomOf="@id/etPrice"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <CheckBox
+        android:id="@+id/cbGeolocationRequired"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Require Geolocation for Joining"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/etWaitlistLimit"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -120,7 +147,7 @@
         android:text="Receive notification when someone signs up"
         android:layout_marginHorizontal="24dp"
         android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/etPrice"
+        app:layout_constraintTop_toBottomOf="@id/cbGeolocationRequired"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
