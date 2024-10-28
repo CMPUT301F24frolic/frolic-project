@@ -19,19 +19,48 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_margin="16dp"/>
 
+    <!-- Event Image Placeholder -->
+    <ImageView
+        android:id="@+id/ivEventImage"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="16dp"
+        android:background="#E0E0E0"
+        android:scaleType="centerCrop"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <!-- Remove Image Button -->
+    <Button
+        android:id="@+id/btnRemoveImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Remove Image"
+        android:backgroundTint="#FF8473"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/ivEventImage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!-- Event Date -->
+
+    <!-- Event Price -->
+
     <TextView
         android:id="@+id/tvEventDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="308dp"
         android:text="Event Date: YYYY/MM/DD"
         android:textColor="#FF8473"
         android:textSize="14sp"
-        android:layout_marginStart="16dp"
-        app:layout_constraintTop_toBottomOf="@id/tvTitle"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle" />
 
-    <!-- Event Price -->
     <TextView
         android:id="@+id/tvEventPrice"
         android:layout_width="wrap_content"

@@ -7,14 +7,15 @@
     android:background="@android:color/white">
 
     <!-- Back Button -->
-    <TextView
+    <Button
         android:id="@+id/tvBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Back"
-        android:textColor="#5DB075"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:text="Back"
+        android:textColor="#5DB075"
+        android:backgroundTint="@android:color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
