@@ -22,10 +22,10 @@ public class LotterySystem {
         confirmedList = new ArrayList<Entrant>();
     }
 
-    public LotterySystem(Event event, int maxAttendees, int maxConfirmed) {
+    public LotterySystem(Event event) {
         this.event = event;
-        this.maxAttendees = maxAttendees;
-        this.maxWaiting = maxConfirmed;
+        this.maxAttendees = event.getMaxConfirmed();
+        this.maxWaiting = event.getWaitlistLimit();
         waitingList = new ArrayList<Entrant>();
         invitedList = new ArrayList<Entrant>();
         confirmedList = new ArrayList<Entrant>();
@@ -42,12 +42,31 @@ public class LotterySystem {
 
     // TODO: Add method that notifies users when they've been drawn for the lottery
 
+    /**
+     * Adds an entrant to the event's waiting list if the maximum capacity has not been reached.
+     *
+     * @param entrant the entrant to be added to the waiting list
+     * @return {@code true} if the entrant was successfully added to the waiting list;
+     *         {@code false} if the waiting list has reached its maximum capacity
+     */
     public boolean addToWaitingList(Entrant entrant) {
-        try { assert waitingList.size() + 1 <= maxWaiting; }
-        catch (AssertionError e) { Log.e("LotterySystem.java", "Tried to add an Entrant greater than the max size of the entrant list.", e); }
-        return waitingList.add(entrant);
+        if (maxWaiting == -1 || waitingList.size() < maxWaiting) {
+            return waitingList.add(entrant);
+        } else {
+            Log.e("LotterySystem", "Waiting list is full. Entrant could not be added.");
+            return false;
+        }
     }
 
+    /**
+     * Removes an entrant from the event's waiting list if they exist on the list.
+     *
+     * @param entrant the entrant to be removed from the waiting list
+     * @return {@code true} if the entrant was successfully removed;
+     *         {@code false} if the entrant was not found in the waiting list
+     * @throws AssertionError if the entrant is not in the waiting list,
+     *                        logs an error indicating the removal attempt for a non-existent entrant
+     */
     public boolean removeFromWaitingList(Entrant entrant) {
         try { assert waitingList.contains(entrant); }
         catch (AssertionError e) { Log.e("LotterySystem.java", "Tried to remove a user that doesn't exist form the waiting list", e); }
