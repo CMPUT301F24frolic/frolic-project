@@ -43,7 +43,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:src="@drawable/map_placeholder"
+                android:src="@android:drawable/ic_menu_add"
                 android:scaleType="fitCenter"
                 android:layout_marginBottom="16dp"/>
 
