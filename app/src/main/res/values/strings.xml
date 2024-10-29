@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">frolic</string>
-        <string-array name="profile_types">
+    <string name="explore_the_app">Explore the app</string>
+    <string name="sign_in">Sign in</string>
+    <string name="new_user_account">New User Account</string>
+    <string-array name="profile_types">
             <item>My Entrant Profile</item>
             <item>My Organizer Profile</item>
             <item>My Admin Profile</item>
