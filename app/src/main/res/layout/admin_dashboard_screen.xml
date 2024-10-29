@@ -5,14 +5,17 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
-    <ImageView
+    <Button
         android:id="@+id/ivBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_back"
-        android:layout_margin="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Back"
+        android:textColor="#5DB075"
+        android:backgroundTint="@android:color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"  />
 
     <TextView
         android:id="@+id/tvTitle"
@@ -42,8 +45,7 @@
             android:layout_height="wrap_content"
             android:text="Manage Events"
             android:background="@android:color/darker_gray"
-            android:padding="16dp"
-            android:drawableEnd="@drawable/ic_arrow_right" />
+            android:padding="16dp" />
 
         <TextView
             android:id="@+id/tvManageProfiles"
@@ -52,8 +54,7 @@
             android:text="Manage Profiles"
             android:background="@android:color/darker_gray"
             android:padding="16dp"
-            android:layout_marginTop="8dp"
-            android:drawableEnd="@drawable/ic_arrow_right" />
+            android:layout_marginTop="8dp" />
 
         <TextView
             android:id="@+id/tvManageImages"
@@ -62,8 +63,7 @@
             android:text="Manage Images"
             android:background="@android:color/darker_gray"
             android:padding="16dp"
-            android:layout_marginTop="8dp"
-            android:drawableEnd="@drawable/ic_arrow_right" />
+            android:layout_marginTop="8dp" />
 
         <TextView
             android:id="@+id/tvManageQRCodes"
@@ -72,8 +72,7 @@
             android:text="Manage QR Codes"
             android:background="@android:color/darker_gray"
             android:padding="16dp"
-            android:layout_marginTop="8dp"
-            android:drawableEnd="@drawable/ic_arrow_right" />
+            android:layout_marginTop="8dp"/>
 
         <TextView
             android:id="@+id/tvManageFacilities"
@@ -82,8 +81,7 @@
             android:text="Manage Facilities"
             android:background="@android:color/darker_gray"
             android:padding="16dp"
-            android:layout_marginTop="8dp"
-            android:drawableEnd="@drawable/ic_arrow_right" />
+            android:layout_marginTop="8dp" />
 
     </LinearLayout>
 

@@ -32,7 +32,6 @@
         android:id="@+id/ivQRCode"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:src="@drawable/qr_code_placeholder" 
         android:adjustViewBounds="true"
         android:background="#E0E0E0"
         android:layout_marginHorizontal="32dp"
