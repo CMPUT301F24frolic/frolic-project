@@ -123,12 +123,14 @@
         android:id="@+id/btnEditProfile"
         android:layout_width="411dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="634dp"
+        android:layout_marginStart="16dp"
         android:backgroundTint="#5DB075"
         android:text="Edit Profile"
         android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.932" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
