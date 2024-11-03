@@ -9,7 +9,7 @@
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Organizer Dashboard"
+        android:text="Entrant Dashboard"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
@@ -28,27 +28,19 @@
         android:layout_marginHorizontal="16dp">
 
         <TextView
-            android:id="@+id/tvCreateEvents"
+            android:id="@+id/tvViewEvents"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Create Events"
-            android:background="@android:color/darker_gray"
-            android:padding="16dp" />
-
-        <TextView
-            android:id="@+id/tvManageEvents"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Manage Events"
+            android:text="View Available Events"
             android:background="@android:color/darker_gray"
             android:padding="16dp"
             android:layout_marginTop="8dp" />
 
         <TextView
-            android:id="@+id/tvViewEntrants"
+            android:id="@+id/tvMyEvents"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="View Entrants"
+            android:text="My Events"
             android:background="@android:color/darker_gray"
             android:padding="16dp"
             android:layout_marginTop="8dp" />
@@ -63,15 +55,27 @@
             android:layout_marginTop="8dp" />
 
         <TextView
-            android:id="@+id/tvFacilitiesProfile"
+            android:id="@+id/tvProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Facilities Profile"
+            android:text="My Profile"
             android:background="@android:color/darker_gray"
             android:padding="16dp"
             android:layout_marginTop="8dp" />
 
     </LinearLayout>
 
+    <Button
+        android:id="@+id/btnScanQR"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Scan QR Code"
+        android:backgroundTint="#5DB075"
+        android:textColor="@android:color/white"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
