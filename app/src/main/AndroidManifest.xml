@@ -26,15 +26,24 @@
         </activity>
         <activity android:name=".ListEventActivity" />
         <activity
+            android:name=".RoleSelectionActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".EntrantEditProfile"
             android:exported="false" />
+
+        <activity
+            android:name=".OrganizerEditProfile"
+            android:exported="false" />
+
         <activity
             android:name=".EntrantDashboardActivity"
             android:exported="false" />
-        <activity android:name=".EventsListActivity" android:exported="false" />
-        <activity android:name=".MyEventsActivity" android:exported="false" />
-        <activity android:name=".NotificationsActivity" android:exported="false" />
-        <activity android:name=".QRScanActivity" android:exported="false" />
+
+        <activity
+            android:name=".OrganizerDashboardActivity"
+            android:exported="false" />
     </application>
 
 
