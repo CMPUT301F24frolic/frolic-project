@@ -94,7 +94,7 @@ public class EntrantEditProfile extends AppCompatActivity {
 
     private void loadExistingData() {
         if (deviceId != null) {
-            db.collection("users").document(deviceId)
+            db.collection("entrants").document(deviceId)
                     .get()
                     .addOnSuccessListener(document -> {
                         if (document.exists()) {
@@ -111,20 +111,18 @@ public class EntrantEditProfile extends AppCompatActivity {
                                 cbNotifications.setChecked(notifications);
                             }
 
-                            Boolean isAdmin = document.getBoolean("admin");
-                            tvAdminStatus.setText("Admin Status: " +
-                                    (isAdmin != null && isAdmin ? "Administrator" : "Regular User"));
-
                             String base64Image = document.getString("profileImage");
                             if (base64Image != null) {
                                 byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
                                 Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-
                                 Glide.with(this)
                                         .load(decodedByte)
                                         .circleCrop()
                                         .into(ivProfileImage);
                             }
+                        } else if (getIntent().getBooleanExtra("isNewRole", false)) {
+                            // New role, try to copy data from organizer profile
+                            copyFromOrganizerProfile();
                         }
                     })
                     .addOnFailureListener(e -> {
@@ -132,6 +130,38 @@ public class EntrantEditProfile extends AppCompatActivity {
                         Toast.makeText(this, "Error loading profile", Toast.LENGTH_SHORT).show();
                     });
         }
+    }
+
+    /**
+     * Copies existing profile data from organizer profile when creating new entrant profile
+     */
+    private void copyFromOrganizerProfile() {
+        db.collection("organizers").document(deviceId)
+                .get()
+                .addOnSuccessListener(document -> {
+                    if (document.exists()) {
+                        etName.setText(document.getString("name"));
+                        etEmail.setText(document.getString("email"));
+                        Long phoneNumber = document.getLong("phoneNumber");
+                        if (phoneNumber != null) {
+                            etPhone.setText(String.valueOf(phoneNumber));
+                        }
+                        String base64Image = document.getString("profileImage");
+                        if (base64Image != null) {
+                            byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
+                            Bitmap decodedByte = BitmapFactory.decodeByteArray(
+                                    decodedString, 0, decodedString.length);
+                            Glide.with(this)
+                                    .load(decodedByte)
+                                    .circleCrop()
+                                    .into(ivProfileImage);
+                        }
+                        if (document.getBoolean("notifications") != null) {
+                            cbNotifications.setChecked(document.getBoolean("notifications"));
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Error copying organizer data", e));
     }
 
     private void checkPermissionAndPickImage() {
@@ -220,7 +250,7 @@ public class EntrantEditProfile extends AppCompatActivity {
     }
 
     private void saveProfileData(Map<String, Object> userData) {
-        db.collection("users")
+        db.collection("entrants")
                 .document(deviceId)
                 .set(userData)
                 .addOnSuccessListener(aVoid -> {

@@ -46,18 +46,27 @@ public class EntrantDashboardActivity extends AppCompatActivity {
             // TODO: Navigate to events list
             // Intent intent = new Intent(this, ViewEventsActivity.class);
             // startActivity(intent);
+            Intent intent = new Intent(this, EventsListActivity.class);  // Connects to ListEventActivity
+            startActivity(intent);
         });
 
         myEvents.setOnClickListener(v -> {
             // TODO: Navigate to my events
             // Intent intent = new Intent(this, MyEventsActivity.class);
             // startActivity(intent);
+            Intent intent = new Intent(this, MyEventsActivity.class);
+            intent.putExtra("deviceId", getIntent().getStringExtra("deviceId"));  // Pass device ID if needed
+            startActivity(intent);
+
         });
 
         notifications.setOnClickListener(v -> {
             // TODO: Navigate to notifications
             // Intent intent = new Intent(this, NotificationsActivity.class);
             // startActivity(intent);
+            Intent intent = new Intent(this, NotificationsActivity.class);
+            intent.putExtra("deviceId", getIntent().getStringExtra("deviceId"));
+            startActivity(intent);
         });
 
         profile.setOnClickListener(v -> {
@@ -70,6 +79,10 @@ public class EntrantDashboardActivity extends AppCompatActivity {
             // TODO: Implement QR scanning
             // Intent intent = new Intent(this, QRScanActivity.class);
             // startActivity(intent);
+            Intent intent = new Intent(this, QRScanActivity.class);
+            intent.putExtra("eventData", "Your event data here");
+            startActivity(intent);
+
         });
     }
 }
