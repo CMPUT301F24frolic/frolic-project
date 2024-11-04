@@ -11,43 +11,52 @@ import java.util.Map;
 public class Event {
     private String eventId;
     private String organizerId;
+    private String facilityId;
     private String eventName;
-    private String eventDesc;
-    private ArrayList<Entrant> confirmed = new ArrayList<>();
-    private Facility facility;
+    private ArrayList<String> entrantIds  = new ArrayList<>();
     private int waitlistLimit;
     private int maxConfirmed;
     private Date eventDate;
     private Date enrollDate;
-    private final LotterySystem lottery;
-    private double price;
+    private String lotterySystemId;
     private boolean geolocationRequired;
     private boolean receiveNotification;
     private String qrHash;
 
     /**
-     * This constructor acts as the main method of creating an event.
-     * Note that Facility is not provided as it should be a prerequisite to create one before starting an event.
-     * I am assuming that the UI will prompt the user to create a facility when trying to create an event if they do not already have one.
+     * Main constructor for creating an event.
+     *
+     * @param eventId            The unique ID of the event
+     * @param organizerId        The ID of the organizer
+     * @param facilityId         The ID of the facility where the event is held
+     * @param eventName          The name of the event
+     * @param maxConfirmed       Maximum number of confirmed entrants
+     * @param waitlistLimit      The limit for the waitlist
+     * @param eventDate          The date of the event
+     * @param enrollDate         The last date for enrollment
+     * @param geolocationRequired Whether geolocation is required for the event
+     * @param receiveNotification Whether notifications are enabled for the event
+     * @param qrHash             The hash for the event's QR code
      */
-    public Event(String eventId, Organizer organizer, String eventName, String eventDesc, int maxConfirmed, int waitlistLimit, Date eventDate, Date enrollDate, double price, boolean geolocationRequired, boolean receiveNotification, String qrHash) {
-        try { assert organizer.getFacility() != null; }
-        catch (AssertionError e) { Log.e("Event.java", "Tried to create an event without a facility", e); }
+    public Event(String eventId, String organizerId, String facilityId, String eventName, int maxConfirmed, int waitlistLimit, Date eventDate, Date enrollDate, boolean geolocationRequired, boolean receiveNotification, String qrHash) {
 
         this.eventId = eventId;
-        this.organizerId = organizer.getOrganizerId();
+        this.organizerId = organizerId;
         this.eventName = eventName;
-        this.eventDesc = eventDesc;
         this.maxConfirmed = maxConfirmed;
         this.waitlistLimit = waitlistLimit;
-        this.facility = organizer.getFacility();
+        this.facilityId = facilityId;
         this.eventDate = eventDate;
         this.enrollDate = enrollDate;
-        this.price = price;
         this.geolocationRequired = geolocationRequired;
         this.receiveNotification = receiveNotification;
         this.qrHash = qrHash;
-        lottery = new LotterySystem(this);
+        this.lotterySystemId = eventId + "_lottery"; // Unique ID for the lottery system
+    }
+
+    // No-argument constructor required by Firebase
+    public Event() {
+        // Leave this empty
     }
 
     /**
@@ -61,38 +70,37 @@ public class Event {
         Map<String, Object> eventMap = new HashMap<>();
         eventMap.put("eventId", eventId);
         eventMap.put("organizerId", organizerId);
+        eventMap.put("facilityId", facilityId);
         eventMap.put("eventName", eventName);
-        eventMap.put("eventDesc", eventDesc);
+        eventMap.put("entrantIds", entrantIds);
         eventMap.put("waitlistLimit", waitlistLimit);
         eventMap.put("maxConfirmed", maxConfirmed);
         eventMap.put("eventDate", eventDate);
         eventMap.put("enrollDate", enrollDate);
-        eventMap.put("price", price);
         eventMap.put("geolocationRequired", geolocationRequired);
+        eventMap.put("receiveNotification", receiveNotification);
         eventMap.put("qrHash", qrHash);
+        eventMap.put("lotterySystemId", lotterySystemId);
         return eventMap;
     }
 
     /**
-     * This method adds an entrant to the entrant list.
-     * @param entrant
-     * This Entrant will be added to the confirmed list in the event.
+     * Adds an entrant's ID to the entrant list.
+     *
+     * @param entrantId The ID of the entrant to add.
      */
-    public void addEntrant(Entrant entrant) {
-        confirmed.add(entrant);
+    public void addEntrantId(String entrantId) {
+        entrantIds.add(entrantId);
     }
 
     /**
-     * This method removes an entrant from the confirmed list, if they exist
-     * @param entrant
-     * This user will be removed from the confirmed list if they are in it
+     * Removes an entrant's ID from the entrant list.
+     *
+     * @param entrantId The ID of the entrant to remove.
+     * @return True if the ID was removed, false if it was not found.
      */
-    public boolean removeEntrant(Entrant entrant) {
-        if (confirmed.contains(entrant)) {
-            return confirmed.remove(entrant);
-        }
-        Log.e("Event.java", "Tried to remove an entrant that doesn't exist in the list");
-        return false;
+    public boolean removeEntrantId(String entrantId) {
+        return entrantIds.remove(entrantId);
     }
 
     /**
@@ -115,30 +123,21 @@ public class Event {
     }
 
 
-    public String getEventDesc() {
-        return eventDesc;
+    public ArrayList<String> getEntrantIds() {
+        return entrantIds;
     }
 
-    public void setEventDesc(String eventDesc) {
-        this.eventDesc = eventDesc;
-    }
-    
-
-    public ArrayList<Entrant> getConfirmed() {
-        return confirmed;
-    }
-
-    public void setConfirmed(ArrayList<Entrant> confirmed) {
-        this.confirmed = confirmed;
+    public void setEntrantIds(ArrayList<String> entrantIds) {
+        this.entrantIds = entrantIds;
     }
 
 
-    public Facility getFacility() {
-        return facility;
+    public String getFacilityId() {
+        return facilityId;
     }
 
-    public void setFacility(Facility facility) {
-        this.facility = facility;
+    public void setFacilityId(String facilityId) {
+        this.facilityId = facilityId;
     }
 
 
@@ -167,8 +166,8 @@ public class Event {
         this.enrollDate = enrollDate;
     }
 
-    public LotterySystem getLottery() {
-        return lottery;
+    public String getLotterySystemId() {
+        return lotterySystemId;
     }
 
     // There is no setter for Lottery, as it is a composition of Event.
@@ -180,10 +179,6 @@ public class Event {
     public void setWaitlistLimit(int waitlistLimit) {
         this.waitlistLimit = waitlistLimit;
     }
-
-    public double getPrice() { return price; }
-
-    public void setPrice(double price) { this.price = price; }
 
     public boolean isGeolocationRequired() { return geolocationRequired;}
 

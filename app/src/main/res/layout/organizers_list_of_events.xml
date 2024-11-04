@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:background="#FFFFFF"
+    android:elevation="4dp"
+    android:padding="16dp"
+    android:radius="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Event Name and Date -->
+        <TextView
+            android:id="@+id/tvEventName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:text="Event Name" />
+
+        <TextView
+            android:id="@+id/tvEventDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:paddingTop="4dp"
+            android:text="Event Date" />
+
+        <!-- Icon Row for Event Actions -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:paddingTop="12dp"
+            android:paddingBottom="8dp"
+            android:weightSum="4">
+
+            <!-- Entrants Icon -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="8dp"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/iconViewEntrants"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/baseline_person_24"
+                    app:tint="#333333" />
+
+                <TextView
+                    android:id="@+id/iconEntrantsLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Entrants"
+                    android:textSize="12sp"
+                    android:textColor="#333333"
+                    android:paddingTop="4dp" />
+            </LinearLayout>
+
+            <!-- Update Icon -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="8dp"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/iconUpdateEvent"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@android:drawable/ic_menu_edit"
+                    app:tint="#333333" />
+
+                <TextView
+                    android:id="@+id/iconUpdateLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Update"
+                    android:textSize="12sp"
+                    android:textColor="#333333"
+                    android:paddingTop="4dp" />
+            </LinearLayout>
+
+            <!-- QR Code Icon -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="8dp"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/iconViewQRCode"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/baseline_qr_code_2_24"
+                    app:tint="#333333" />
+
+                <TextView
+                    android:id="@+id/iconQRCodeLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="QR Code"
+                    android:textSize="12sp"
+                    android:textColor="#333333"
+                    android:paddingTop="4dp" />
+            </LinearLayout>
+
+            <!-- Map Icon -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="8dp"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/iconViewMap"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@android:drawable/ic_menu_mapmode"
+                    android:visibility="gone"
+                    app:tint="#333333" />
+
+                <TextView
+                    android:id="@+id/iconMapLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Map"
+                    android:textSize="12sp"
+                    android:textColor="#333333"
+                    android:paddingTop="4dp"
+                    android:visibility="gone"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
