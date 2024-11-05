@@ -5,21 +5,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Spinner
-        android:id="@+id/spinnerProfileType"
+    <TextView
+        android:id="@+id/tvProfileType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:text="My Entrant Profile"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:entries="@array/profile_types"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <ImageView
         android:id="@+id/ivProfileImage"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="98dp"
+        android:layout_height="105dp"
         android:layout_marginStart="155dp"
         android:layout_marginTop="53dp"
         android:layout_marginBottom="578dp"
@@ -29,109 +32,93 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tvUserName"
+
+    <EditText
+        android:id="@+id/etUserName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="139dp"
-        android:layout_marginBottom="17dp"
-        android:text="Marvis Ighedosa"
+        android:layout_marginStart="176dp"
+        android:text="Name"
         android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/btnGenerateProfileImage"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivProfileImage"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/ivProfileImage" />
 
     <Button
-        android:id="@+id/btnGenerateProfileImage"
+        android:id="@+id/btnAddProfileImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="108dp"
-        android:layout_marginTop="195dp"
-        android:text="Generate Profile Image"
+        android:layout_marginStart="136dp"
+        android:layout_marginTop="192dp"
+        android:text="Add Profile Image"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 
     <TextView
         android:id="@+id/tvMobileLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="314dp"
         android:text="Mobile Number (Optional)"
         android:textColor="#000000"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/tvUserMobile"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnGenerateProfileImage"
-        app:layout_constraintVertical_bias="0.948" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tvUserMobile"
+    <EditText
+        android:id="@+id/etUserMobile"
         android:layout_width="411dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="347dp"
+        android:inputType="phone"
         android:padding="12dp"
-        android:text="+234 9011039271"
+        android:text="number"
         android:textColor="#757575"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Email Label -->
-    <TextView
-        android:id="@+id/tvEmailLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Email"
-        android:textColor="#000000"
-        android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvUserMobile" />
 
     <!-- Email Text Box -->
 
     <TextView
-        android:id="@+id/tvUserEmail"
-        android:layout_width="0dp"
+        android:id="@+id/tvEmailLabel"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:padding="12dp"
-        android:text="Dosamarvis@gmail.com"
-        android:textColor="#757575"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/btnViewEvent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="409dp"
+        android:text="Email"
+        android:textColor="#000000"
+        android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvEmailLabel"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/btnViewEvent"
+    <EditText
+        android:id="@+id/etUserEmail"
         android:layout_width="411dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="572dp"
+        android:layout_marginTop="437dp"
+        android:layout_marginBottom="248dp"
+        android:inputType="textEmailAddress"
+        android:padding="12dp"
+        android:text="Email"
+        android:textColor="#757575"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <Button
+        android:id="@+id/btnSaveChanges"
+        android:layout_width="411dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="634dp"
         android:backgroundTint="#5DB075"
-        android:text="View My Events"
+        android:text="Save Changes"
         android:textColor="#FFFFFF"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/btnEditProfile"
-        android:layout_width="411dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:backgroundTint="#5DB075"
-        android:text="Edit Profile"
-        android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.932" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
