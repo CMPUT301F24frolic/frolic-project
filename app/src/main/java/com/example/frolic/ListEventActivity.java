@@ -1,6 +1,7 @@
 package com.example.frolic;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Editable;
@@ -18,11 +19,13 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -34,9 +37,10 @@ import java.util.Locale;
  */
 public class ListEventActivity extends AppCompatActivity {
     private FirebaseFirestore db;
-    private EditText etEventName, etEventDate, etLastDateRegistration, etVacancy, etPrice, etWaitlistLimit;
+    private EditText etEventName, etEventDate, etLastDateRegistration, etVacancy, etWaitlistLimit;
     private CheckBox cbGeolocationRequired, cbNotification;
     private Button btnListEvent;
+    private String organizerId, facilityId;;
 
     private Date eventDate;
     private Date enrollDate;
@@ -54,13 +58,27 @@ public class ListEventActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_event_screen);
 
+        // Get organizerId from intent
+        organizerId = getIntent().getStringExtra("deviceId");
+        if (organizerId == null) {
+            Toast.makeText(this, "Organizer ID is missing", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        facilityId = getIntent().getStringExtra("facilityId");
+        if (facilityId == null) {
+            Toast.makeText(this, "Facility ID is missing", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         db = FirebaseFirestore.getInstance();
 
         etEventName = findViewById(R.id.etEventName);
         etEventDate = findViewById(R.id.etEventDate);
         etLastDateRegistration = findViewById(R.id.etLastDateRegistration);
         etVacancy = findViewById(R.id.etVacancy);
-        etPrice = findViewById(R.id.etPrice);
         etWaitlistLimit = findViewById(R.id.etWaitlistLimit);
         cbGeolocationRequired = findViewById(R.id.cbGeolocationRequired);
         cbNotification = findViewById(R.id.cbNotification);
@@ -74,11 +92,38 @@ public class ListEventActivity extends AppCompatActivity {
         etEventDate.addTextChangedListener(textWatcher);
         etLastDateRegistration.addTextChangedListener(textWatcher);
         etVacancy.addTextChangedListener(textWatcher);
-        etPrice.addTextChangedListener(textWatcher);
 
         // Initially disable the Enroll Date field, user has to first select an event date
         etLastDateRegistration.setEnabled(false);
 
+        initializeDatePickers();
+
+        // Set up button click listener to capture input data
+        btnListEvent.setOnClickListener(v -> {
+            if (!btnListEvent.isEnabled()) {
+                // Show toast message if required fields are not filled
+                Toast.makeText(ListEventActivity.this, "Please fill in all required fields.", Toast.LENGTH_SHORT).show();
+            } else {
+                // Proceed to create and save the event
+                createAndSaveEvent();
+            }
+        });
+
+        ImageView ivClose = findViewById(R.id.ivClose);
+        ivClose.setOnClickListener(v -> {
+            // Navigate back to the Organizer Dashboard
+            Intent intent = new Intent(ListEventActivity.this, OrganizerDashboardActivity.class);
+            intent.putExtra("deviceId", organizerId);
+            startActivity(intent);
+            finish();
+        });
+    }
+
+    /**
+     * Sets up the DatePicker for EventDate and EnrollDate fields. EventDate must be selected first,
+     * and EnrollDate is restricted to the range between the current date and the selected EventDate.
+     */
+    private void initializeDatePickers() {
         // Make EditText for EventDate non-editable so that we use DatePickerDialog instead
         etEventDate.setFocusable(false);
         etEventDate.setOnClickListener(v -> showDatePickerDialog(
@@ -98,39 +143,21 @@ public class ListEventActivity extends AppCompatActivity {
                 },
                 null // No max date for Event Date
         ));
-
-        // Set up button click listener to capture input data
-        btnListEvent.setOnClickListener(v -> {
-            if (!btnListEvent.isEnabled()) {
-                // Show toast message if required fields are not filled
-                Toast.makeText(ListEventActivity.this, "Please fill in all required fields.", Toast.LENGTH_SHORT).show();
-            } else {
-                // Proceed to create and save the event
-                createAndSaveEvent();
-            }
-        });
     }
 
     /**
-     * Creates an Event object with data from input fields, generates a hash for the QR code,
-     * and saves the event to Firestore. Also provides feedback with Toast messages.
+     * Creates an Event object with data from input fields, generates a QR code hash,
+     * and saves the event to Firestore. Also initializes a LotterySystem for the event.
      */
     private void createAndSaveEvent() {
         // Capture data from input fields
         String eventName = etEventName.getText().toString();
-        String eventDesc = "Description for the event"; // Placeholder, need textbox?
         String vacancyText = etVacancy.getText().toString();
         int maxConfirmed = vacancyText.isEmpty() ? 0 : Integer.parseInt(vacancyText);
-        String priceText = etPrice.getText().toString();
-        double price = priceText.isEmpty() ? 0.0 : Double.parseDouble(priceText);
         String waitlistLimitText = etWaitlistLimit.getText().toString();
         int waitlistLimit = waitlistLimitText.isEmpty() ? -1 : Integer.parseInt(waitlistLimitText);
         boolean geolocationRequired = cbGeolocationRequired.isChecked();
         boolean receiveNotification = cbNotification.isChecked();
-
-        //Replace organizer with actual organizer, this is for TESTING PURPOSES ONLY
-        Identity mockIdentity = new Identity("MockDeviceID");
-        Organizer organizer = new Organizer(mockIdentity);
 
         // Generate a unique event ID using Firestore
         DocumentReference newEventRef = db.collection("events").document();
@@ -142,14 +169,13 @@ public class ListEventActivity extends AppCompatActivity {
         // Create the Event object
         Event event = new Event(
                 eventId,
-                organizer,
+                organizerId,
+                facilityId,
                 eventName,
-                eventDesc,
                 maxConfirmed,
                 waitlistLimit,
                 eventDate,
                 enrollDate,
-                price,
                 geolocationRequired,
                 receiveNotification,
                 QRCodeHash
@@ -159,11 +185,41 @@ public class ListEventActivity extends AppCompatActivity {
         newEventRef.set(event.toMap())
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Event created successfully!", Toast.LENGTH_SHORT).show();
+                    // Add the event ID to the organizer's eventsOrganizing list
+                    db.collection("organizers").document(organizerId)
+                            .update("eventsOrganizing", FieldValue.arrayUnion(eventId))
+                            .addOnSuccessListener(aVoid2 -> Log.d("OrganizerUpdate", "Event ID added to organizer's eventsOrganizing list"))
+                            .addOnFailureListener(e -> Log.e("OrganizerUpdate", "Error adding event ID to organizer", e));
+                    initializeLotterySystem(event, eventId);
+
+                    // Navigate back to the Organizer Dashboard
+                    Intent intent = new Intent(ListEventActivity.this, OrganizerDashboardActivity.class);
+                    intent.putExtra("deviceId", organizerId);
+                    startActivity(intent);
+                    finish();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Error saving event.", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 });
+    }
+
+    /**
+     * Initializes a LotterySystem for the event in Firestore using the event's ID and settings.
+     *
+     * @param event the Event object for which the LotterySystem is created
+     */
+    private void initializeLotterySystem(Event event, String eventId) {
+        DocumentReference lotteryRef = db.collection("lotteries").document(eventId);
+        LotterySystem lotterySystem = new LotterySystem(
+                event.getLotterySystemId(),
+                event.getEventId(),
+                event.getMaxConfirmed(),
+                event.getWaitlistLimit()
+        );
+        lotteryRef.set(lotterySystem.toMap())
+                .addOnSuccessListener(aVoid -> Log.d("LotterySystem", "Lottery system initialized for event " + eventId))
+                .addOnFailureListener(e -> Log.e("LotterySystem", "Error initializing lottery system for event " + eventId, e));
     }
 
 
@@ -226,8 +282,7 @@ public class ListEventActivity extends AppCompatActivity {
             boolean isReady = !etEventName.getText().toString().isEmpty() &&
                     !etEventDate.getText().toString().isEmpty() &&
                     !etLastDateRegistration.getText().toString().isEmpty() &&
-                    !etVacancy.getText().toString().isEmpty() &&
-                    !etPrice.getText().toString().isEmpty();
+                    !etVacancy.getText().toString().isEmpty();
 
             // Enable or disable the button based on the above condition
             btnListEvent.setEnabled(isReady);
@@ -236,4 +291,14 @@ public class ListEventActivity extends AppCompatActivity {
         @Override
         public void afterTextChanged(Editable editable) {}
     };
+
+    @Override
+    public void onBackPressed() {
+        // Handle back button to return to organizer dashboard
+        super.onBackPressed();
+        Intent intent = new Intent(this, OrganizerDashboardActivity.class);
+        intent.putExtra("deviceId", organizerId);
+        startActivity(intent);
+        finish();
+    }
 }

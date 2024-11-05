@@ -28,6 +28,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -302,11 +303,25 @@ public class OrganizerEditProfile extends AppCompatActivity {
         userData.put("role", "ORGANIZER");
         userData.put("facilityId", facilityId);
 
-        if (selectedImageUri != null) {
-            handleImageInFirestore(userData);
-        } else {
-            saveToFirestore(userData);
-        }
+        db.collection("organizers").document(deviceId)
+                .get()
+                .addOnSuccessListener(document -> {
+                    if (!document.exists() || !document.contains("eventsOrganizing")) {
+                        // Initialize `eventsOrganizing` as an empty list only if it doesn’t exist
+                        userData.put("eventsOrganizing", new ArrayList<>());
+                    }
+
+                    // Add image processing if a new image is selected
+                    if (selectedImageUri != null) {
+                        handleImageInFirestore(userData);
+                    } else {
+                        saveToFirestore(userData);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error checking if eventsOrganizing exists", e);
+                    Toast.makeText(this, "Error saving profile", Toast.LENGTH_SHORT).show();
+                });
     }
 
     /**

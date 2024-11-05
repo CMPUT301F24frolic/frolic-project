@@ -6,8 +6,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -20,6 +21,7 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
     private static final String TAG = "OrganizerDashboard";
     private FirebaseFirestore db;
     private String deviceId;
+    private String facilityId;
 
     /**
      * Initializes the dashboard activity, setting up click listeners for
@@ -35,6 +37,24 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         deviceId = getIntent().getStringExtra("deviceId");
+
+        // Fetch facilityId based on the organizer ID
+        db.collection("organizers")
+                .document(deviceId)
+                .get()
+                .addOnSuccessListener(document -> {
+                    if (document.exists() && document.contains("facilityId")) {
+                        facilityId = document.getString("facilityId");
+                        Log.d(TAG, "Facility ID retrieved from organizer: " + facilityId);
+                    } else {
+                        Log.d(TAG, "Facility ID not found in organizer document");
+                        Toast.makeText(this, "Facility ID not found for this organizer", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error fetching facility ID", e);
+                    Toast.makeText(this, "Error accessing facility information", Toast.LENGTH_SHORT).show();
+                });
 
         // Initialize views and set up click listeners
         setupNavigationOptions();
@@ -70,27 +90,21 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
     private void setupNavigationOptions() {
         TextView createEvents = findViewById(R.id.tvCreateEvents);
         TextView manageEvents = findViewById(R.id.tvManageEvents);
-        TextView viewEntrants = findViewById(R.id.tvViewEntrants);
         TextView notifications = findViewById(R.id.tvNotifications);
-        TextView facilitiesProfile = findViewById(R.id.tvFacilitiesProfile);
+        TextView myProfile = findViewById(R.id.tvMyProfile);
 
 
         createEvents.setOnClickListener(v -> {
             Intent intent = new Intent(this, ListEventActivity.class);
-            intent.putExtra("deviceId", getIntent().getStringExtra("deviceId"));
+            intent.putExtra("deviceId", deviceId);
+            intent.putExtra("facilityId", facilityId);
             startActivity(intent);
         });
 
         manageEvents.setOnClickListener(v -> {
-            // TODO: Navigate to manage events
-            // Intent intent = new Intent(this, ManageEventsActivity.class);
-            // startActivity(intent);
-        });
-
-        viewEntrants.setOnClickListener(v -> {
-            // TODO: Navigate to view entrants
-            // Intent intent = new Intent(this, ViewEntrantsActivity.class);
-            // startActivity(intent);
+            Intent intent = new Intent(this, ManageEventsActivity.class);
+            intent.putExtra("deviceId", deviceId);
+            startActivity(intent);
         });
 
         notifications.setOnClickListener(v -> {
@@ -99,7 +113,7 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
             // startActivity(intent);
         });
 
-        facilitiesProfile.setOnClickListener(v -> {
+        myProfile.setOnClickListener(v -> {
             // Check if facility exists and load for editing
             db.collection("facilities")
                     .whereEqualTo("organizerId", deviceId)

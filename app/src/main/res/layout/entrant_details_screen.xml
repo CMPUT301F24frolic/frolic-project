@@ -39,6 +39,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Updated LinearLayout with labels and counts -->
     <LinearLayout
         android:id="@+id/llStatus"
         android:layout_width="match_parent"
@@ -49,29 +50,80 @@
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
         android:layout_marginTop="16dp">
 
-        <TextView
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Waiting List\n00"
-            android:textAlignment="center"
-            android:textColor="#FF9800" />
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Picked\n00"
-            android:textAlignment="center"
-            android:textColor="#FF9800" />
+            <TextView
+                android:id="@+id/tvWaitingListLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Waiting List"
+                android:textColor="#FF9800"
+                android:textStyle="bold"
+                android:textAlignment="center" />
 
-        <TextView
+            <TextView
+                android:id="@+id/tvWaitingListCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00"
+                android:textAlignment="center"
+                android:textColor="#FF9800" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Not Picked\n00"
-            android:textAlignment="center"
-            android:textColor="#FF9800" />
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/tvChosenLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chosen"
+                android:textColor="#FF9800"
+                android:textStyle="bold"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/tvChosenCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00"
+                android:textAlignment="center"
+                android:textColor="#FF9800" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/tvCanceledLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Canceled"
+                android:textColor="#FF9800"
+                android:textStyle="bold"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/tvCanceledCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00"
+                android:textAlignment="center"
+                android:textColor="#FF9800" />
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -114,11 +166,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="24dp"
+        android:layout_marginBottom="16dp"
         android:backgroundTint="#5DB075"
         android:text="Notify All Entrants"
         android:textColor="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="659dp" />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
