@@ -25,6 +25,14 @@
             </intent-filter>
         </activity>
         <activity android:name=".ListEventActivity" />
+        <activity android:name=".ManageEventsActivity" />
+        <activity android:name=".EntrantDetailsActivity" />
+        <activity android:name=".DisplayEventQrCodeActivity" />
+        <activity android:name=".UpdateEventActivity" />
+        <activity android:name=".MapViewActivity" />
+        <activity android:name=".CanceledEntrantsActivity" />
+        <activity android:name=".ChosenEntrantsActivity" />
+        <activity android:name=".WaitingListActivity" />
         <activity
             android:name=".RoleSelectionActivity"
             android:exported="false" />

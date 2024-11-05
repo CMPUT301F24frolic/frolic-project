@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/filter_waiting_list"
+        android:title="Waiting List" />
+    <item
+        android:id="@+id/filter_chosen"
+        android:title="Chosen Entrants" />
+    <item
+        android:id="@+id/filter_canceled"
+        android:title="Canceled Entrants" />
+</menu>

@@ -45,15 +45,6 @@
             android:layout_marginTop="8dp" />
 
         <TextView
-            android:id="@+id/tvViewEntrants"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="View Entrants"
-            android:background="@android:color/darker_gray"
-            android:padding="16dp"
-            android:layout_marginTop="8dp" />
-
-        <TextView
             android:id="@+id/tvNotifications"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -63,10 +54,10 @@
             android:layout_marginTop="8dp" />
 
         <TextView
-            android:id="@+id/tvFacilitiesProfile"
+            android:id="@+id/tvMyProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Facilities Profile"
+            android:text="My Profile"
             android:background="@android:color/darker_gray"
             android:padding="16dp"
             android:layout_marginTop="8dp" />
