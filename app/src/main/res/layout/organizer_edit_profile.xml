@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Organizer Profile"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp" />
+
+        <!-- Profile Section -->
+        <TextView
+            android:id="@+id/tvProfileSection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Profile Information"
+            android:textStyle="bold"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="24dp"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
+            android:id="@+id/ivProfileImage"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="16dp"
+            android:background="@android:color/darker_gray"
+            android:scaleType="centerCrop"
+            app:layout_constraintTop_toBottomOf="@id/tvProfileSection"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <Button
+            android:id="@+id/btnUploadImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Upload Profile Picture"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/ivProfileImage"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Name"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="16dp"
+            android:padding="12dp"
+            android:background="@android:color/darker_gray"
+            app:layout_constraintTop_toBottomOf="@id/btnUploadImage"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <EditText
+            android:id="@+id/etEmail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="16dp"
+            android:padding="12dp"
+            android:background="@android:color/darker_gray"
+            app:layout_constraintTop_toBottomOf="@id/etName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <EditText
+            android:id="@+id/etPhone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Phone Number (Optional)"
+            android:inputType="phone"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="16dp"
+            android:padding="12dp"
+            android:background="@android:color/darker_gray"
+            app:layout_constraintTop_toBottomOf="@id/etEmail"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Facility Section -->
+        <TextView
+            android:id="@+id/tvFacilitySection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Facility Information"
+            android:textStyle="bold"
+            android:layout_marginTop="32dp"
+            android:layout_marginStart="24dp"
+            app:layout_constraintTop_toBottomOf="@id/etPhone"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <EditText
+            android:id="@+id/etFacilityName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Facility Name"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="16dp"
+            android:padding="12dp"
+            android:background="@android:color/darker_gray"
+            app:layout_constraintTop_toBottomOf="@id/tvFacilitySection"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <EditText
+            android:id="@+id/etFacilityAddress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Facility Address"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="16dp"
+            android:padding="12dp"
+            android:background="@android:color/darker_gray"
+            app:layout_constraintTop_toBottomOf="@id/etFacilityName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Settings Section -->
+        <CheckBox
+            android:id="@+id/cbNotifications"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Enable Notifications"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintTop_toBottomOf="@id/etFacilityAddress"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <Button
+            android:id="@+id/btnSaveProfile"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Save Profile"
+            android:backgroundTint="#5DB075"
+            android:textColor="@android:color/white"
+            android:layout_margin="24dp"
+            app:layout_constraintTop_toBottomOf="@id/cbNotifications"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
