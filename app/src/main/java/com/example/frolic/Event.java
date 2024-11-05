@@ -4,12 +4,15 @@ import android.graphics.Bitmap;
 import android.util.Log;
 import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.IgnoreExtraProperties;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents an event in the system with various attributes including organizer, name, description,
+ * confirmed entrants, facility, and other event details.
+ */
 @IgnoreExtraProperties
 public class Event {
     private String eventId;
@@ -22,18 +25,37 @@ public class Event {
     private int maxConfirmed;
     private Date eventDate;
     private Date enrollDate;
+    private final LotterySystem lottery;
     private double price;
     private boolean geolocationRequired;
     private boolean receiveNotification;
     private String qrHash;
 
-    // A no-argument constructor is required for Firestore deserialization
-    public Event() {}
+    // No-argument constructor required for Firestore deserialization
+    public Event() {
+        this.lottery = new LotterySystem(this);
+    }
 
+    /**
+     * Creates an Event instance with the specified parameters.
+     *
+     * @param eventId               Unique identifier for the event.
+     * @param organizer             Organizer of the event.
+     * @param eventName             Name of the event.
+     * @param eventDesc             Description of the event.
+     * @param maxConfirmed          Maximum number of confirmed entrants.
+     * @param waitlistLimit         Limit for the waitlist.
+     * @param eventDate             Date of the event.
+     * @param enrollDate            Enrollment date for the event.
+     * @param price                 Price of attending the event.
+     * @param geolocationRequired   Whether geolocation is required.
+     * @param receiveNotification   Whether notifications should be sent for the event.
+     * @param qrHash                QR hash associated with the event.
+     */
     public Event(String eventId, Organizer organizer, String eventName, String eventDesc, int maxConfirmed, int waitlistLimit, Date eventDate, Date enrollDate, double price, boolean geolocationRequired, boolean receiveNotification, String qrHash) {
-        try { assert organizer.getFacility() != null; }
-        catch (AssertionError e) { Log.e("Event.java", "Tried to create an event without a facility", e); }
-
+        if (organizer.getFacility() == null) {
+            Log.e("Event.java", "Tried to create an event without a facility");
+        }
         this.eventId = eventId;
         this.organizerId = organizer.getOrganizerId();
         this.eventName = eventName;
@@ -47,6 +69,7 @@ public class Event {
         this.geolocationRequired = geolocationRequired;
         this.receiveNotification = receiveNotification;
         this.qrHash = qrHash;
+        this.lottery = new LotterySystem(this);
     }
 
     // Getters and setters for Firestore compatibility
@@ -169,8 +192,10 @@ public class Event {
     }
 
     /**
-     * Converts the event's attributes into a map representation suitable for storage in Firebase.
+     * Converts the event's attributes into a map representation suitable for storage in Firestore.
      * Each attribute is stored as a key-value pair, allowing for structured data storage in Firestore.
+     *
+     * @return a map containing the event's attributes, with attribute names as keys and their respective values.
      */
     public Map<String, Object> toMap() {
         Map<String, Object> eventMap = new HashMap<>();
