@@ -3,7 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+
 
     <application
         android:allowBackup="true"
@@ -45,8 +47,9 @@
             android:name=".OrganizerDashboardActivity"
             android:exported="false" />
 
-        <activity android:name=".MyEventsActivity" />
+        <activity android:name=".EventDetailsActivity$MyEventsActivity" />
         <activity android:name=".NotificationsActivity" />
+        <activity android:name=".EventDetailsActivity" />
         <activity android:name=".QRScanActivity" android:exported="false" />
         <activity android:name=".EventsListActivity" android:exported="false" />
     </application>
