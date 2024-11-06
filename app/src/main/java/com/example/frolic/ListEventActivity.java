@@ -167,6 +167,14 @@ public class ListEventActivity extends AppCompatActivity {
         String QRCodeHash = String.valueOf(eventId.hashCode());
 
         // Create the Event object
+        // Create the Event object with the available parameters
+        // Example setup for variables in listactivity.java
+        String organizerId = "someOrganizerId"; // Replace with actual logic to get organizer ID
+        String facilityId = "someFacilityId";   // Replace with actual logic to get facility ID
+        String qrHash = "someQrHash";           // Replace with actual logic to get QR hash
+
+// Ensure these values are available before instantiating Event
+
         Event event = new Event(
                 eventId,
                 organizerId,
@@ -178,8 +186,9 @@ public class ListEventActivity extends AppCompatActivity {
                 enrollDate,
                 geolocationRequired,
                 receiveNotification,
-                QRCodeHash
+                qrHash                 // Assuming QRCodeHash is intended to be qrHash
         );
+
 
         // Save the event to Firestore
         newEventRef.set(event.toMap())
