@@ -34,7 +34,7 @@ public class QRScanActivity extends AppCompatActivity {
         });
 
         // Retrieve event data from the Intent
-        String eventData = getIntent().getStringExtra("eventData");
+        String eventData = getIntent().getStringExtra("eventData"); // "eventData is qrHash
 
         if (eventData != null && !eventData.isEmpty()) {
             // Generate the QR code from the event data

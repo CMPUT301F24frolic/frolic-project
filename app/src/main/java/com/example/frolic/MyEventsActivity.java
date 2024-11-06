@@ -14,78 +14,71 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Activity that displays the list of events an entrant is enrolled in.
- * Users can view detailed information about each event by clicking on it.
  */
 public class MyEventsActivity extends AppCompatActivity {
 
     private static final String TAG = "MyEventsActivity";
     private RecyclerView recyclerView;
     private MyEventsAdapter adapter;
-    private ArrayList<Event> myEventsList = new ArrayList<>();
+    private ArrayList<EventWithOrganizer> myEventsList = new ArrayList<>();
     private Button btnBack;
-
-    // Firestore database instance
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference eventsRef = db.collection("events");
     private String entrantId;
 
-    /**
-     * Initializes the activity and sets up the UI components.
-     * Loads events the entrant is enrolled in from Firestore.
-     *
-     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
-     *                           this Bundle contains the data it most recently supplied in {@link #onSaveInstanceState}.
-     */
+    private static class EventWithOrganizer {
+        Event event;
+        String organizerName;
+
+        public EventWithOrganizer(Event event, String organizerName) {
+            this.event = event;
+            this.organizerName = organizerName;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_events);
 
-        // Get the entrant ID from the Intent
         entrantId = getIntent().getStringExtra("entrantId");
 
-        // Initialize the back button and set click listener
         btnBack = findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(v -> {
-            finish(); // Finish current activity to go back
-        });
+        btnBack.setOnClickListener(v -> finish());
 
-        // Set up RecyclerView
         recyclerView = findViewById(R.id.recyclerViewMyEvents);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new MyEventsAdapter(myEventsList);
         recyclerView.setAdapter(adapter);
 
-        // Load events from Firestore
         loadMyEventsFromFirestore();
     }
 
-    /**
-     * Loads the list of events the entrant is enrolled in from Firestore
-     * and updates the RecyclerView.
-     */
     private void loadMyEventsFromFirestore() {
-        eventsRef.whereArrayContains("confirmedEntrants", entrantId)
+        eventsRef.whereArrayContains("entrantIds", entrantId)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         myEventsList.clear();
                         QuerySnapshot querySnapshot = task.getResult();
                         if (querySnapshot != null) {
+                            Map<String, String> organizerNamesCache = new HashMap<>();
                             for (DocumentSnapshot document : querySnapshot) {
                                 Event event = document.toObject(Event.class);
                                 if (event != null) {
-                                    myEventsList.add(event);
+                                    fetchOrganizerName(event, organizerNamesCache);
                                 }
                             }
-                            adapter.notifyDataSetChanged();
                         }
                     } else {
                         Log.w(TAG, "Error getting documents.", task.getException());
@@ -94,19 +87,34 @@ public class MyEventsActivity extends AppCompatActivity {
                 });
     }
 
-    /**
-     * Adapter class for displaying the entrant's events in a RecyclerView.
-     */
+    private void fetchOrganizerName(Event event, Map<String, String> organizerNamesCache) {
+        String organizerId = event.getOrganizerId();
+        if (organizerNamesCache.containsKey(organizerId)) {
+            myEventsList.add(new EventWithOrganizer(event, organizerNamesCache.get(organizerId)));
+            adapter.notifyDataSetChanged();
+        } else {
+            DocumentReference organizerRef = db.collection("organizers").document(organizerId);
+            organizerRef.get().addOnSuccessListener(documentSnapshot -> {
+                String organizerName = documentSnapshot.getString("name");
+                if (organizerName != null) {
+                    organizerNamesCache.put(organizerId, organizerName);
+                    myEventsList.add(new EventWithOrganizer(event, organizerName));
+                } else {
+                    myEventsList.add(new EventWithOrganizer(event, "Unknown"));
+                }
+                adapter.notifyDataSetChanged();
+            }).addOnFailureListener(e -> {
+                myEventsList.add(new EventWithOrganizer(event, "Unknown"));
+                adapter.notifyDataSetChanged();
+            });
+        }
+    }
+
     private class MyEventsAdapter extends RecyclerView.Adapter<MyEventsAdapter.MyEventsViewHolder> {
 
-        private ArrayList<Event> eventsList;
+        private ArrayList<EventWithOrganizer> eventsList;
 
-        /**
-         * Constructor for MyEventsAdapter.
-         *
-         * @param eventsList The list of events to display.
-         */
-        public MyEventsAdapter(ArrayList<Event> eventsList) {
+        public MyEventsAdapter(ArrayList<EventWithOrganizer> eventsList) {
             this.eventsList = eventsList;
         }
 
@@ -119,14 +127,13 @@ public class MyEventsActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull MyEventsViewHolder holder, int position) {
-            Event event = eventsList.get(position);
-            holder.eventName.setText(event.getEventName());
-            holder.eventDescription.setText(event.getEventDesc());
+            EventWithOrganizer eventWithOrganizer = eventsList.get(position);
+            holder.eventName.setText(eventWithOrganizer.event.getEventName());
+            holder.organizerName.setText("Organized by: " + eventWithOrganizer.organizerName);
 
-            // Set click listener to navigate to EventDetailsActivity
             holder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(MyEventsActivity.this, EventDetailsActivity.class);
-                intent.putExtra("eventId", event.getEventId());
+                intent.putExtra("eventId", eventWithOrganizer.event.getEventId());
                 startActivity(intent);
             });
         }
@@ -136,26 +143,17 @@ public class MyEventsActivity extends AppCompatActivity {
             return eventsList.size();
         }
 
-        /**
-         * ViewHolder class for individual event items.
-         */
         public class MyEventsViewHolder extends RecyclerView.ViewHolder {
-            TextView eventName, eventDescription;
+            TextView eventName, organizerName;
 
-            /**
-             * Constructor for MyEventsViewHolder.
-             *
-             * @param itemView The item view layout.
-             */
             public MyEventsViewHolder(@NonNull View itemView) {
                 super(itemView);
                 eventName = itemView.findViewById(R.id.tvEventName);
-                eventDescription = itemView.findViewById(R.id.tvEventDescription);
+                organizerName = itemView.findViewById(R.id.tvOrganizerName);
             }
         }
     }
 }
-
 
 
 

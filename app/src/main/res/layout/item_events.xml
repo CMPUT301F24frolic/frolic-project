@@ -15,10 +15,11 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/tvEventDescription"
+        android:id="@+id/tvOrganizerName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Event Description"
+        android:text="Organized by: Organizer Name"
         android:textSize="14sp"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="4dp"
+        android:textColor="#7D7D7D" />
 </LinearLayout>

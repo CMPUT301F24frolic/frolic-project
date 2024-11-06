@@ -20,6 +20,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
+/**
+ * Activity for displaying notifications for a specific device ID.
+ */
 public class NotificationsActivity extends AppCompatActivity {
 
     private static final String TAG = "NotificationsActivity";
@@ -46,6 +49,7 @@ public class NotificationsActivity extends AppCompatActivity {
             finish();
         });
 
+        // Initialize RecyclerView and Adapter
         recyclerView = findViewById(R.id.recyclerViewNotifications);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new NotificationsAdapter(notificationList);
@@ -54,7 +58,7 @@ public class NotificationsActivity extends AppCompatActivity {
         // Get the device ID from the Intent
         deviceId = getIntent().getStringExtra("deviceId");
 
-        // Load notifications from Firestore
+        // Load notifications from Firestore if the device ID is available
         if (deviceId != null) {
             loadNotifications(deviceId);
         } else {
@@ -62,7 +66,13 @@ public class NotificationsActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Loads notifications for the specified device ID from Firestore.
+     *
+     * @param deviceId The device ID to load notifications for.
+     */
     private void loadNotifications(String deviceId) {
+        // Query the notifications collection based on the device ID and its sub-collection "messages"
         notificationsRef.document(deviceId).collection("messages").get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -82,7 +92,7 @@ public class NotificationsActivity extends AppCompatActivity {
     }
 
     /**
-     * Inner Adapter Class for Notifications
+     * Adapter class for displaying notifications in a RecyclerView.
      */
     private class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdapter.NotificationViewHolder> {
 
@@ -110,7 +120,7 @@ public class NotificationsActivity extends AppCompatActivity {
         }
 
         /**
-         * ViewHolder class for individual notification items
+         * ViewHolder class for individual notification items.
          */
         public class NotificationViewHolder extends RecyclerView.ViewHolder {
             TextView notificationText;

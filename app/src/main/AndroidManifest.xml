@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
 
     <application
@@ -47,7 +48,7 @@
             android:name=".OrganizerDashboardActivity"
             android:exported="false" />
 
-        <activity android:name=".EventDetailsActivity$MyEventsActivity" />
+        <activity android:name=".MyEventsActivity"/>
         <activity android:name=".NotificationsActivity" />
         <activity android:name=".EventDetailsActivity" />
         <activity android:name=".QRScanActivity" android:exported="false" />

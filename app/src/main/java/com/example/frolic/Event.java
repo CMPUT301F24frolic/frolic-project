@@ -1,94 +1,123 @@
 package com.example.frolic;
-
 import android.graphics.Bitmap;
-import android.util.Log;
-import com.google.firebase.firestore.Exclude;
-import com.google.firebase.firestore.IgnoreExtraProperties;
-import java.util.ArrayList;
+
 import java.util.Date;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Represents an event in the system with various attributes including organizer, name, description,
- * confirmed entrants, facility, and other event details.
- */
-@IgnoreExtraProperties
 public class Event {
     private String eventId;
     private String organizerId;
+    private String facilityId;
     private String eventName;
-    private String eventDesc;
-    private ArrayList<Entrant> confirmed = new ArrayList<>();
-    private Facility facility;
+    private ArrayList<String> entrantIds  = new ArrayList<>();
     private int waitlistLimit;
     private int maxConfirmed;
     private Date eventDate;
     private Date enrollDate;
-    private final LotterySystem lottery;
-    private double price;
+    private String lotterySystemId;
     private boolean geolocationRequired;
     private boolean receiveNotification;
     private String qrHash;
 
-    // No-argument constructor required for Firestore deserialization
+// Firebase requires a public no-argument constructor
+
     public Event() {
-        this.lottery = new LotterySystem(this);
+
+        // Leave this empty for Firebase deserialization
+
     }
 
     /**
-     * Creates an Event instance with the specified parameters.
+     * Main constructor for creating an event.
      *
-     * @param eventId               Unique identifier for the event.
-     * @param organizer             Organizer of the event.
-     * @param eventName             Name of the event.
-     * @param eventDesc             Description of the event.
-     * @param maxConfirmed          Maximum number of confirmed entrants.
-     * @param waitlistLimit         Limit for the waitlist.
-     * @param eventDate             Date of the event.
-     * @param enrollDate            Enrollment date for the event.
-     * @param price                 Price of attending the event.
-     * @param geolocationRequired   Whether geolocation is required.
-     * @param receiveNotification   Whether notifications should be sent for the event.
-     * @param qrHash                QR hash associated with the event.
+     * @param eventId            The unique ID of the event
+     * @param organizerId        The ID of the organizer
+     * @param facilityId         The ID of the facility where the event is held
+     * @param eventName          The name of the event
+     * @param maxConfirmed       Maximum number of confirmed entrants
+     * @param waitlistLimit      The limit for the waitlist
+     * @param eventDate          The date of the event
+     * @param enrollDate         The last date for enrollment
+     * @param geolocationRequired Whether geolocation is required for the event
+     * @param receiveNotification Whether notifications are enabled for the event
+     * @param qrHash             The hash for the event's QR code
      */
-    public Event(String eventId, Organizer organizer, String eventName, String eventDesc, int maxConfirmed, int waitlistLimit, Date eventDate, Date enrollDate, double price, boolean geolocationRequired, boolean receiveNotification, String qrHash) {
-        if (organizer.getFacility() == null) {
-            Log.e("Event.java", "Tried to create an event without a facility");
-        }
+    public Event(String eventId, String organizerId, String facilityId, String eventName, int maxConfirmed, int waitlistLimit, Date eventDate, Date enrollDate, boolean geolocationRequired, boolean receiveNotification, String qrHash) {
+
         this.eventId = eventId;
-        this.organizerId = organizer.getOrganizerId();
+        this.organizerId = organizerId;
         this.eventName = eventName;
-        this.eventDesc = eventDesc;
         this.maxConfirmed = maxConfirmed;
         this.waitlistLimit = waitlistLimit;
-        this.facility = organizer.getFacility();
+        this.facilityId = facilityId;
         this.eventDate = eventDate;
         this.enrollDate = enrollDate;
-        this.price = price;
         this.geolocationRequired = geolocationRequired;
         this.receiveNotification = receiveNotification;
         this.qrHash = qrHash;
-        this.lottery = new LotterySystem(this);
+        this.lotterySystemId = eventId + "_lottery"; // Unique ID for the lottery system
     }
 
-    // Getters and setters for Firestore compatibility
-
-    public String getEventId() {
-        return eventId;
+    public Event(String eventId, Organizer organizer, String eventName, String eventDesc, int maxConfirmed, int waitlistLimit, Date eventDate, Date enrollDate, double price, boolean geolocationRequired, boolean receiveNotification, String QRCodeHash) {
     }
 
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
+    /**
+     * Converts the event's attributes into a map representation suitable for storage in Firebase.
+     * Each attribute is stored as a key-value pair, allowing for structured data storage in Firestore.
+     *
+     * @return a map containing the event's attributes, with attribute names as keys
+     *         and their respective values, formatted for Firebase storage
+     */
+    public Map<String, Object> toMap() {
+        Map<String, Object> eventMap = new HashMap<>();
+        eventMap.put("eventId", eventId);
+        eventMap.put("organizerId", organizerId);
+        eventMap.put("facilityId", facilityId);
+        eventMap.put("eventName", eventName);
+        eventMap.put("entrantIds", entrantIds);
+        eventMap.put("waitlistLimit", waitlistLimit);
+        eventMap.put("maxConfirmed", maxConfirmed);
+        eventMap.put("eventDate", eventDate);
+        eventMap.put("enrollDate", enrollDate);
+        eventMap.put("geolocationRequired", geolocationRequired);
+        eventMap.put("receiveNotification", receiveNotification);
+        eventMap.put("qrHash", qrHash);
+        eventMap.put("lotterySystemId", lotterySystemId);
+        return eventMap;
     }
 
-    public String getOrganizerId() {
-        return organizerId;
+    /**
+     * Adds an entrant's ID to the entrant list.
+     *
+     * @param entrantId The ID of the entrant to add.
+     */
+    public void addEntrantId(String entrantId) {
+        entrantIds.add(entrantId);
     }
 
-    public void setOrganizerId(String organizerId) {
-        this.organizerId = organizerId;
+    /**
+     * Removes an entrant's ID from the entrant list.
+     *
+     * @param entrantId The ID of the entrant to remove.
+     * @return True if the ID was removed, false if it was not found.
+     */
+    public boolean removeEntrantId(String entrantId) {
+        return entrantIds.remove(entrantId);
     }
+
+    /**
+     * Generates a QR code bitmap based on the event hash.
+     * @return A Bitmap containing the QR code, or null if generation fails.
+     */
+    public Bitmap getEventQRCode() { return QRCodeGenerator.generateQRCode(qrHash);}
+
+
+    // Getters and Setters
+    // Some of these may be redundant. Feel free to remove later if they seem that way
+    // TODO: add Javadocs
 
     public String getEventName() {
         return eventName;
@@ -98,37 +127,24 @@ public class Event {
         this.eventName = eventName;
     }
 
-    public String getEventDesc() {
-        return eventDesc;
+
+    public ArrayList<String> getEntrantIds() {
+        return entrantIds;
     }
 
-    public void setEventDesc(String eventDesc) {
-        this.eventDesc = eventDesc;
+    public void setEntrantIds(ArrayList<String> entrantIds) {
+        this.entrantIds = entrantIds;
     }
 
-    public ArrayList<Entrant> getConfirmed() {
-        return confirmed;
+
+    public String getFacilityId() {
+        return facilityId;
     }
 
-    public void setConfirmed(ArrayList<Entrant> confirmed) {
-        this.confirmed = confirmed;
+    public void setFacilityId(String facilityId) {
+        this.facilityId = facilityId;
     }
 
-    public Facility getFacility() {
-        return facility;
-    }
-
-    public void setFacility(Facility facility) {
-        this.facility = facility;
-    }
-
-    public int getWaitlistLimit() {
-        return waitlistLimit;
-    }
-
-    public void setWaitlistLimit(int waitlistLimit) {
-        this.waitlistLimit = waitlistLimit;
-    }
 
     public int getMaxConfirmed() {
         return maxConfirmed;
@@ -146,6 +162,7 @@ public class Event {
         this.eventDate = eventDate;
     }
 
+
     public Date getEnrollDate() {
         return enrollDate;
     }
@@ -154,20 +171,53 @@ public class Event {
         this.enrollDate = enrollDate;
     }
 
-    public double getPrice() {
-        return price;
+    public String getLotterySystemId() {
+        return lotterySystemId;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public String getOrganizerId() {
+        return organizerId;
     }
 
-    public boolean isGeolocationRequired() {
-        return geolocationRequired;
+    public void setOrganizerId(String organizerId) {
+        this.organizerId = organizerId;
     }
 
-    public void setGeolocationRequired(boolean geolocationRequired) {
-        this.geolocationRequired = geolocationRequired;
+    public class EventWithOrganizer {
+        private Event event;
+        private String organizerName;
+
+        public EventWithOrganizer(Event event, String organizerName) {
+            this.event = event;
+            this.organizerName = organizerName;
+        }
+
+        public Event getEvent() {
+            return event;
+        }
+
+        public String getOrganizerName() {
+            return organizerName;
+        }
+    }
+
+
+    // There is no setter for Lottery, as it is a composition of Event.
+
+    public int getWaitlistLimit() {
+        return waitlistLimit;
+    }
+
+    public void setWaitlistLimit(int waitlistLimit) {
+        this.waitlistLimit = waitlistLimit;
+    }
+
+    public boolean isGeolocationRequired() { return geolocationRequired;}
+
+    public void setGeolocationRequired(boolean geolocationRequired) {this.geolocationRequired = geolocationRequired; }
+
+    public String getEventId() {
+        return eventId;
     }
 
     public boolean isReceiveNotification() {
@@ -180,36 +230,5 @@ public class Event {
 
     public String getQrHash() {
         return qrHash;
-    }
-
-    public void setQrHash(String qrHash) {
-        this.qrHash = qrHash;
-    }
-
-    @Exclude
-    public Bitmap getEventQRCode() {
-        return QRCodeGenerator.generateQRCode(qrHash);
-    }
-
-    /**
-     * Converts the event's attributes into a map representation suitable for storage in Firestore.
-     * Each attribute is stored as a key-value pair, allowing for structured data storage in Firestore.
-     *
-     * @return a map containing the event's attributes, with attribute names as keys and their respective values.
-     */
-    public Map<String, Object> toMap() {
-        Map<String, Object> eventMap = new HashMap<>();
-        eventMap.put("eventId", eventId);
-        eventMap.put("organizerId", organizerId);
-        eventMap.put("eventName", eventName);
-        eventMap.put("eventDesc", eventDesc);
-        eventMap.put("waitlistLimit", waitlistLimit);
-        eventMap.put("maxConfirmed", maxConfirmed);
-        eventMap.put("eventDate", eventDate);
-        eventMap.put("enrollDate", enrollDate);
-        eventMap.put("price", price);
-        eventMap.put("geolocationRequired", geolocationRequired);
-        eventMap.put("qrHash", qrHash);
-        return eventMap;
     }
 }

@@ -85,7 +85,7 @@ public class EntrantDashboardActivity extends AppCompatActivity {
             // TODO: Navigate to my events
             // Intent intent = new Intent(this, MyEventsActivity.class);
             // startActivity(intent);
-            Intent intent = new Intent(this, EventDetailsActivity.MyEventsActivity.class);
+            Intent intent = new Intent(this, EventDetailsActivity.class);
             intent.putExtra("deviceId", getIntent().getStringExtra("deviceId"));  // Pass device ID if needed
             startActivity(intent);
 
