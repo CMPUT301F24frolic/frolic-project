@@ -21,11 +21,6 @@ public class Event {
     private boolean receiveNotification;
     private String qrHash;
 
-    // Constructor for Firebase deserialization
-    public Event() {
-        // Leave this empty for Firebase
-    }
-
     /**
      * Main constructor for creating an event.
      *
@@ -44,16 +39,21 @@ public class Event {
     public Event(String eventId, String organizerId, String facilityId, String eventName, int maxConfirmed, int waitlistLimit, Date eventDate, Date enrollDate, boolean geolocationRequired, boolean receiveNotification, String qrHash) {
         this.eventId = eventId;
         this.organizerId = organizerId;
-        this.facilityId = facilityId;
         this.eventName = eventName;
         this.maxConfirmed = maxConfirmed;
         this.waitlistLimit = waitlistLimit;
+        this.facilityId = facilityId;
         this.eventDate = eventDate;
         this.enrollDate = enrollDate;
         this.geolocationRequired = geolocationRequired;
         this.receiveNotification = receiveNotification;
         this.qrHash = qrHash;
         this.lotterySystemId = eventId + "_lottery"; // Unique ID for the lottery system
+    }
+
+    // No-argument constructor required by Firebase
+    public Event() {
+        // Leave this empty
     }
 
     /**
@@ -81,31 +81,34 @@ public class Event {
         return eventMap;
     }
 
+    /**
+     * Adds an entrant's ID to the entrant list.
+     *
+     * @param entrantId The ID of the entrant to add.
+     */
+    public void addEntrantId(String entrantId) {
+        entrantIds.add(entrantId);
+    }
+
+    /**
+     * Removes an entrant's ID from the entrant list.
+     *
+     * @param entrantId The ID of the entrant to remove.
+     * @return True if the ID was removed, false if it was not found.
+     */
+    public boolean removeEntrantId(String entrantId) {
+        return entrantIds.remove(entrantId);
+    }
+
+    /**
+     * Generates a QR code bitmap based on the event hash.
+     * @return A Bitmap containing the QR code, or null if generation fails.
+     */
+    public Bitmap getEventQRCode() {
+        return QRCodeGenerator.generateQRCode(qrHash);
+    }
+
     // Getters and Setters
-    public String getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
-    }
-
-    public String getOrganizerId() {
-        return organizerId;
-    }
-
-    public void setOrganizerId(String organizerId) {
-        this.organizerId = organizerId;
-    }
-
-    public String getFacilityId() {
-        return facilityId;
-    }
-
-    public void setFacilityId(String facilityId) {
-        this.facilityId = facilityId;
-    }
-
     public String getEventName() {
         return eventName;
     }
@@ -122,12 +125,12 @@ public class Event {
         this.entrantIds = entrantIds;
     }
 
-    public int getWaitlistLimit() {
-        return waitlistLimit;
+    public String getFacilityId() {
+        return facilityId;
     }
 
-    public void setWaitlistLimit(int waitlistLimit) {
-        this.waitlistLimit = waitlistLimit;
+    public void setFacilityId(String facilityId) {
+        this.facilityId = facilityId;
     }
 
     public int getMaxConfirmed() {
@@ -158,12 +161,24 @@ public class Event {
         return lotterySystemId;
     }
 
+    public int getWaitlistLimit() {
+        return waitlistLimit;
+    }
+
+    public void setWaitlistLimit(int waitlistLimit) {
+        this.waitlistLimit = waitlistLimit;
+    }
+
     public boolean isGeolocationRequired() {
         return geolocationRequired;
     }
 
     public void setGeolocationRequired(boolean geolocationRequired) {
         this.geolocationRequired = geolocationRequired;
+    }
+
+    public String getEventId() {
+        return eventId;
     }
 
     public boolean isReceiveNotification() {
@@ -182,12 +197,11 @@ public class Event {
         this.qrHash = qrHash;
     }
 
-    /**
-     * Generates a QR code bitmap based on the event hash.
-     * @return A Bitmap containing the QR code, or null if generation fails.
-     */
-    public Bitmap getEventQRCode() {
-        return QRCodeGenerator.generateQRCode(qrHash);
+    public String getOrganizerId() {
+        return organizerId;
+    }
+
+    public void setOrganizerId(String organizerId) {
+        this.organizerId = organizerId;
     }
 }
-
