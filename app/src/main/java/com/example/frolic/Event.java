@@ -22,12 +22,8 @@ public class Event {
     private boolean receiveNotification;
     private String qrHash;
 
-// Firebase requires a public no-argument constructor
 
-    public Event() {
-
-        // Leave this empty for Firebase deserialization
-
+    public Event(String eventId, Organizer organizer, String eventName, String eventDesc, int maxConfirmed, int waitlistLimit, Date eventDate, Date enrollDate, double price, boolean geolocationRequired, boolean receiveNotification, String QRCodeHash) {
     }
 
     /**
@@ -61,8 +57,7 @@ public class Event {
         this.lotterySystemId = eventId + "_lottery"; // Unique ID for the lottery system
     }
 
-    public Event(String eventId, Organizer organizer, String eventName, String eventDesc, int maxConfirmed, int waitlistLimit, Date eventDate, Date enrollDate, double price, boolean geolocationRequired, boolean receiveNotification, String QRCodeHash) {
-    }
+    public Event() {}
 
     /**
      * Converts the event's attributes into a map representation suitable for storage in Firebase.
@@ -127,7 +122,6 @@ public class Event {
         this.eventName = eventName;
     }
 
-
     public ArrayList<String> getEntrantIds() {
         return entrantIds;
     }
@@ -135,7 +129,6 @@ public class Event {
     public void setEntrantIds(ArrayList<String> entrantIds) {
         this.entrantIds = entrantIds;
     }
-
 
     public String getFacilityId() {
         return facilityId;
