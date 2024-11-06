@@ -58,6 +58,17 @@
             android:textColor="@android:color/white"
             android:padding="16dp" />
 
+        <Button
+            android:id="@+id/btnAdmin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Admin"
+            android:backgroundTint="#5DB075"
+            android:textColor="@android:color/white"
+            android:padding="16dp"
+            android:visibility="gone"
+        />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
