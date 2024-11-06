@@ -1,9 +1,8 @@
 package com.example.frolic;
+
 import android.graphics.Bitmap;
-
-import java.util.Date;
-
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,7 +11,7 @@ public class Event {
     private String organizerId;
     private String facilityId;
     private String eventName;
-    private ArrayList<String> entrantIds  = new ArrayList<>();
+    private ArrayList<String> entrantIds = new ArrayList<>();
     private int waitlistLimit;
     private int maxConfirmed;
     private Date eventDate;
@@ -22,8 +21,9 @@ public class Event {
     private boolean receiveNotification;
     private String qrHash;
 
-
-    public Event(String eventId, Organizer organizer, String eventName, String eventDesc, int maxConfirmed, int waitlistLimit, Date eventDate, Date enrollDate, double price, boolean geolocationRequired, boolean receiveNotification, String QRCodeHash) {
+    // Constructor for Firebase deserialization
+    public Event() {
+        // Leave this empty for Firebase
     }
 
     /**
@@ -42,13 +42,12 @@ public class Event {
      * @param qrHash             The hash for the event's QR code
      */
     public Event(String eventId, String organizerId, String facilityId, String eventName, int maxConfirmed, int waitlistLimit, Date eventDate, Date enrollDate, boolean geolocationRequired, boolean receiveNotification, String qrHash) {
-
         this.eventId = eventId;
         this.organizerId = organizerId;
+        this.facilityId = facilityId;
         this.eventName = eventName;
         this.maxConfirmed = maxConfirmed;
         this.waitlistLimit = waitlistLimit;
-        this.facilityId = facilityId;
         this.eventDate = eventDate;
         this.enrollDate = enrollDate;
         this.geolocationRequired = geolocationRequired;
@@ -56,8 +55,6 @@ public class Event {
         this.qrHash = qrHash;
         this.lotterySystemId = eventId + "_lottery"; // Unique ID for the lottery system
     }
-
-    public Event() {}
 
     /**
      * Converts the event's attributes into a map representation suitable for storage in Firebase.
@@ -84,35 +81,30 @@ public class Event {
         return eventMap;
     }
 
-    /**
-     * Adds an entrant's ID to the entrant list.
-     *
-     * @param entrantId The ID of the entrant to add.
-     */
-    public void addEntrantId(String entrantId) {
-        entrantIds.add(entrantId);
-    }
-
-    /**
-     * Removes an entrant's ID from the entrant list.
-     *
-     * @param entrantId The ID of the entrant to remove.
-     * @return True if the ID was removed, false if it was not found.
-     */
-    public boolean removeEntrantId(String entrantId) {
-        return entrantIds.remove(entrantId);
-    }
-
-    /**
-     * Generates a QR code bitmap based on the event hash.
-     * @return A Bitmap containing the QR code, or null if generation fails.
-     */
-    public Bitmap getEventQRCode() { return QRCodeGenerator.generateQRCode(qrHash);}
-
-
     // Getters and Setters
-    // Some of these may be redundant. Feel free to remove later if they seem that way
-    // TODO: add Javadocs
+    public String getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
+    }
+
+    public String getOrganizerId() {
+        return organizerId;
+    }
+
+    public void setOrganizerId(String organizerId) {
+        this.organizerId = organizerId;
+    }
+
+    public String getFacilityId() {
+        return facilityId;
+    }
+
+    public void setFacilityId(String facilityId) {
+        this.facilityId = facilityId;
+    }
 
     public String getEventName() {
         return eventName;
@@ -130,14 +122,13 @@ public class Event {
         this.entrantIds = entrantIds;
     }
 
-    public String getFacilityId() {
-        return facilityId;
+    public int getWaitlistLimit() {
+        return waitlistLimit;
     }
 
-    public void setFacilityId(String facilityId) {
-        this.facilityId = facilityId;
+    public void setWaitlistLimit(int waitlistLimit) {
+        this.waitlistLimit = waitlistLimit;
     }
-
 
     public int getMaxConfirmed() {
         return maxConfirmed;
@@ -155,7 +146,6 @@ public class Event {
         this.eventDate = eventDate;
     }
 
-
     public Date getEnrollDate() {
         return enrollDate;
     }
@@ -168,49 +158,12 @@ public class Event {
         return lotterySystemId;
     }
 
-    public String getOrganizerId() {
-        return organizerId;
+    public boolean isGeolocationRequired() {
+        return geolocationRequired;
     }
 
-    public void setOrganizerId(String organizerId) {
-        this.organizerId = organizerId;
-    }
-
-    public class EventWithOrganizer {
-        private Event event;
-        private String organizerName;
-
-        public EventWithOrganizer(Event event, String organizerName) {
-            this.event = event;
-            this.organizerName = organizerName;
-        }
-
-        public Event getEvent() {
-            return event;
-        }
-
-        public String getOrganizerName() {
-            return organizerName;
-        }
-    }
-
-
-    // There is no setter for Lottery, as it is a composition of Event.
-
-    public int getWaitlistLimit() {
-        return waitlistLimit;
-    }
-
-    public void setWaitlistLimit(int waitlistLimit) {
-        this.waitlistLimit = waitlistLimit;
-    }
-
-    public boolean isGeolocationRequired() { return geolocationRequired;}
-
-    public void setGeolocationRequired(boolean geolocationRequired) {this.geolocationRequired = geolocationRequired; }
-
-    public String getEventId() {
-        return eventId;
+    public void setGeolocationRequired(boolean geolocationRequired) {
+        this.geolocationRequired = geolocationRequired;
     }
 
     public boolean isReceiveNotification() {
@@ -224,4 +177,17 @@ public class Event {
     public String getQrHash() {
         return qrHash;
     }
+
+    public void setQrHash(String qrHash) {
+        this.qrHash = qrHash;
+    }
+
+    /**
+     * Generates a QR code bitmap based on the event hash.
+     * @return A Bitmap containing the QR code, or null if generation fails.
+     */
+    public Bitmap getEventQRCode() {
+        return QRCodeGenerator.generateQRCode(qrHash);
+    }
 }
+

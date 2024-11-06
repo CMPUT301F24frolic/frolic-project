@@ -60,7 +60,6 @@ public class ListEventActivity extends AppCompatActivity {
         etEventDate = findViewById(R.id.etEventDate);
         etLastDateRegistration = findViewById(R.id.etLastDateRegistration);
         etVacancy = findViewById(R.id.etVacancy);
-        etPrice = findViewById(R.id.etPrice);
         etWaitlistLimit = findViewById(R.id.etWaitlistLimit);
         cbGeolocationRequired = findViewById(R.id.cbGeolocationRequired);
         cbNotification = findViewById(R.id.cbNotification);
@@ -74,7 +73,6 @@ public class ListEventActivity extends AppCompatActivity {
         etEventDate.addTextChangedListener(textWatcher);
         etLastDateRegistration.addTextChangedListener(textWatcher);
         etVacancy.addTextChangedListener(textWatcher);
-        etPrice.addTextChangedListener(textWatcher);
 
         // Initially disable the Enroll Date field, user has to first select an event date
         etLastDateRegistration.setEnabled(false);
@@ -121,8 +119,6 @@ public class ListEventActivity extends AppCompatActivity {
         String eventDesc = "Description for the event"; // Placeholder, need textbox?
         String vacancyText = etVacancy.getText().toString();
         int maxConfirmed = vacancyText.isEmpty() ? 0 : Integer.parseInt(vacancyText);
-        String priceText = etPrice.getText().toString();
-        double price = priceText.isEmpty() ? 0.0 : Double.parseDouble(priceText);
         String waitlistLimitText = etWaitlistLimit.getText().toString();
         int waitlistLimit = waitlistLimitText.isEmpty() ? -1 : Integer.parseInt(waitlistLimitText);
         boolean geolocationRequired = cbGeolocationRequired.isChecked();
@@ -140,20 +136,28 @@ public class ListEventActivity extends AppCompatActivity {
         String QRCodeHash = String.valueOf(eventId.hashCode());
 
         // Create the Event object
+        // Create the Event object with the available parameters
+        // Example setup for variables in listactivity.java
+        String organizerId = "someOrganizerId"; // Replace with actual logic to get organizer ID
+        String facilityId = "someFacilityId";   // Replace with actual logic to get facility ID
+        String qrHash = "someQrHash";           // Replace with actual logic to get QR hash
+
+// Ensure these values are available before instantiating Event
+
         Event event = new Event(
                 eventId,
-                organizer,
+                organizerId,          // Assuming you have the organizer's ID as a String
+                facilityId,           // Provide the facility ID if available
                 eventName,
-                eventDesc,
                 maxConfirmed,
                 waitlistLimit,
                 eventDate,
                 enrollDate,
-                price,
                 geolocationRequired,
                 receiveNotification,
-                QRCodeHash
+                qrHash                 // Assuming QRCodeHash is intended to be qrHash
         );
+
 
         // Save the event to Firestore
         newEventRef.set(event.toMap())
