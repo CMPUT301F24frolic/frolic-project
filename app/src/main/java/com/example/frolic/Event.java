@@ -1,8 +1,10 @@
 package com.example.frolic;
-
 import android.graphics.Bitmap;
-import java.util.ArrayList;
+import android.util.Log;
+
 import java.util.Date;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,7 +13,7 @@ public class Event {
     private String organizerId;
     private String facilityId;
     private String eventName;
-    private ArrayList<String> entrantIds = new ArrayList<>();
+    private ArrayList<String> entrantIds  = new ArrayList<>();
     private int waitlistLimit;
     private int maxConfirmed;
     private Date eventDate;
@@ -37,6 +39,7 @@ public class Event {
      * @param qrHash             The hash for the event's QR code
      */
     public Event(String eventId, String organizerId, String facilityId, String eventName, int maxConfirmed, int waitlistLimit, Date eventDate, Date enrollDate, boolean geolocationRequired, boolean receiveNotification, String qrHash) {
+
         this.eventId = eventId;
         this.organizerId = organizerId;
         this.eventName = eventName;
@@ -104,11 +107,13 @@ public class Event {
      * Generates a QR code bitmap based on the event hash.
      * @return A Bitmap containing the QR code, or null if generation fails.
      */
-    public Bitmap getEventQRCode() {
-        return QRCodeGenerator.generateQRCode(qrHash);
-    }
+    public Bitmap getEventQRCode() { return QRCodeGenerator.generateQRCode(qrHash);}
+
 
     // Getters and Setters
+    // Some of these may be redundant. Feel free to remove later if they seem that way
+    // TODO: add Javadocs
+
     public String getEventName() {
         return eventName;
     }
@@ -116,6 +121,7 @@ public class Event {
     public void setEventName(String eventName) {
         this.eventName = eventName;
     }
+
 
     public ArrayList<String> getEntrantIds() {
         return entrantIds;
@@ -125,6 +131,7 @@ public class Event {
         this.entrantIds = entrantIds;
     }
 
+
     public String getFacilityId() {
         return facilityId;
     }
@@ -132,6 +139,7 @@ public class Event {
     public void setFacilityId(String facilityId) {
         this.facilityId = facilityId;
     }
+
 
     public int getMaxConfirmed() {
         return maxConfirmed;
@@ -149,6 +157,7 @@ public class Event {
         this.eventDate = eventDate;
     }
 
+
     public Date getEnrollDate() {
         return enrollDate;
     }
@@ -161,6 +170,8 @@ public class Event {
         return lotterySystemId;
     }
 
+    // There is no setter for Lottery, as it is a composition of Event.
+
     public int getWaitlistLimit() {
         return waitlistLimit;
     }
@@ -169,13 +180,9 @@ public class Event {
         this.waitlistLimit = waitlistLimit;
     }
 
-    public boolean isGeolocationRequired() {
-        return geolocationRequired;
-    }
+    public boolean isGeolocationRequired() { return geolocationRequired;}
 
-    public void setGeolocationRequired(boolean geolocationRequired) {
-        this.geolocationRequired = geolocationRequired;
-    }
+    public void setGeolocationRequired(boolean geolocationRequired) {this.geolocationRequired = geolocationRequired; }
 
     public String getEventId() {
         return eventId;
@@ -192,11 +199,6 @@ public class Event {
     public String getQrHash() {
         return qrHash;
     }
-
-    public void setQrHash(String qrHash) {
-        this.qrHash = qrHash;
-    }
-
     public String getOrganizerId() {
         return organizerId;
     }
