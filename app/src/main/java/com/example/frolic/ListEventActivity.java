@@ -146,8 +146,8 @@ public class ListEventActivity extends AppCompatActivity {
 
         Event event = new Event(
                 eventId,
-                organizerId,          // Assuming you have the organizer's ID as a String
-                facilityId,           // Provide the facility ID if available
+                organizerId,
+                facilityId,
                 eventName,
                 maxConfirmed,
                 waitlistLimit,
