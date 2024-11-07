@@ -18,7 +18,6 @@ public class EntrantProfileActivity extends Activity {
     // Request code for Edit Profile
     private static final int EDIT_PROFILE_REQUEST = 1;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +36,7 @@ public class EntrantProfileActivity extends Activity {
         String email = intent.getStringExtra("email");
         String phone = intent.getStringExtra("phone");
         String profileImageUriString = intent.getStringExtra("profileImageUri");
-
+        String deviceId = intent.getStringExtra("deviceId");
 
         // Set user data in views
         if (name != null) {
@@ -56,48 +55,14 @@ public class EntrantProfileActivity extends Activity {
 
         // Set listener for "Edit Profile" button
         editProfileButton.setOnClickListener(v -> {
-            // Create an intent to start the EditProfileActivity
-            Intent editIntent = new Intent(EntrantProfileActivity.this, EntrantEditProfileActivity.class);
+            // Create an intent to start the EntrantEditProfile activity
+            Intent editIntent = new Intent(EntrantProfileActivity.this, EntrantEditProfile.class);
 
-            // Pass the current profile data to the edit activity
-            editIntent.putExtra("name", nameViewText.getText().toString());
-            editIntent.putExtra("email", emailViewText.getText().toString());
-            editIntent.putExtra("phone", phoneViewText.getText().toString());
-            editIntent.putExtra("profileImageUri", profileImageUriString);
-
-            // Start the EditProfileActivity and wait for the result
-            startActivityForResult(editIntent, EDIT_PROFILE_REQUEST);
+            // Pass the current profile data and deviceId to the edit activity
+            editIntent.putExtra("deviceId", deviceId);
+            startActivity(editIntent);
+            // No need for startActivityForResult as EntrantEditProfile handles Firebase directly
         });
-
-    }
-
-    // Handle the result from EditProfileActivity
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == EDIT_PROFILE_REQUEST && resultCode == RESULT_OK && data != null) {
-            // Retrieve the updated profile data
-            String updatedName = data.getStringExtra("updatedName");
-            String updatedEmail = data.getStringExtra("updatedEmail");
-            String updatedPhone = data.getStringExtra("updatedPhone");
-            String updatedProfileImageUri = data.getStringExtra("updatedProfileImageUri");
-
-            // Update the UI with the new data
-            if (updatedName != null) {
-                nameViewText.setText(updatedName);
-            }
-            if (updatedEmail != null) {
-                emailViewText.setText(updatedEmail);
-            }
-            if (updatedPhone != null) {
-                phoneViewText.setText(updatedPhone);
-            }
-            if (updatedProfileImageUri != null) {
-                Uri profileImageUri = Uri.parse(updatedProfileImageUri);
-                profileImageView.setImageURI(profileImageUri);
-            }
-        }
 
         // Set listener for "View events" button
         viewEventsButton.setOnClickListener(v -> {
