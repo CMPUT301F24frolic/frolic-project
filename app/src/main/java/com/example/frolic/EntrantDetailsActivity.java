@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * EntrantDetailsActivity displays details for an event's entrants, including counts for
@@ -25,6 +27,7 @@ import java.util.ArrayList;
 public class EntrantDetailsActivity extends AppCompatActivity {
 
     private TextView tvBack, tvFilter, tvWaitingListCount, tvChosenCount, tvCanceledCount;
+    private Button btnPickEntrants, btnNotifyAllEntrants;
     private RecyclerView rvEntrants;
     private EntrantsAdapter adapter;
     private ArrayList<String> confirmedEntrantIds = new ArrayList<>();
@@ -56,6 +59,9 @@ public class EntrantDetailsActivity extends AppCompatActivity {
         tvCanceledCount = findViewById(R.id.tvCanceledCount);
         rvEntrants = findViewById(R.id.rvEntrants);
 
+        btnPickEntrants = findViewById(R.id.btnPickEntrants);
+        btnNotifyAllEntrants = findViewById(R.id.btnNotifyAllEntrants);
+
         rvEntrants.setLayoutManager(new LinearLayoutManager(this));
         adapter = new EntrantsAdapter(confirmedEntrantIds); // Pass the list of entrant IDs
         rvEntrants.setAdapter(adapter);
@@ -72,7 +78,49 @@ public class EntrantDetailsActivity extends AppCompatActivity {
 
         // Set up filter dropdown
         tvFilter.setOnClickListener(this::showFilterMenu);
+
+        // Set up lottery picking
+        btnPickEntrants.setOnClickListener(v -> pickEntrants());
     }
+
+    private void pickEntrants() {
+        db.collection("lotteries").document(eventId) // Use "lotteries" here
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        LotterySystem lottery = documentSnapshot.toObject(LotterySystem.class);
+
+                        if (lottery == null) {
+                            Log.e("PickEntrants", "LotterySystem is null");
+                            return;
+                        }
+
+                        // Call the lottery draw method to update the lists
+                        lottery.drawLottery();
+
+                        ArrayList<String> inviteds = lottery.getInvitedListIds();
+
+                        for(int i = 0; i < inviteds.size(); i++) {
+                            Log.d("", "" + inviteds.get(i));
+                        }
+                        // Update Firestore with the modified lists
+                        db.collection("lotteries").document(eventId) // Ensure "lotteries" here too
+                                .set(lottery)
+                                .addOnSuccessListener(aVoid -> {
+                                    Log.d("PickEntrants", "LotterySystem updated successfully");
+                                    loadEntrantDetails();
+                                })
+                                .addOnFailureListener(e -> Log.e("PickEntrants", "Error updating LotterySystem", e));
+
+                        Log.d("PickEntrants", "Max attendees: " + lottery.getMaxAttendees());
+                    } else {
+                        Log.d("EventRead", "No such event found");
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("EventRead", "Error fetching event", e));
+    }
+
+
 
     /**
      * Loads entrant details from Firestore for the current event, including entrant counts and IDs.
