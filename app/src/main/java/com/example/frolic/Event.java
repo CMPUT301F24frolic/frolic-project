@@ -199,7 +199,6 @@ public class Event {
     public String getQrHash() {
         return qrHash;
     }
-
     public String getOrganizerId() {
         return organizerId;
     }

@@ -4,6 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Back Button -->
+    <Button
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Back"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_margin="16dp"
+        android:backgroundTint="?attr/colorPrimary"
+        android:textColor="@android:color/white" />
+
     <TextView
         android:id="@+id/tvProfileTitle"
         android:layout_width="wrap_content"
@@ -15,7 +27,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/btnBack" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -31,7 +43,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Profile Image Section -->
+            <!-- Profile Image -->
             <ImageView
                 android:id="@+id/ivProfileImage"
                 android:layout_width="120dp"
@@ -50,38 +62,22 @@
                 android:text="Upload Profile Picture" />
 
             <!-- Name Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Name"
-                android:textColor="#000000"
-                android:textSize="16sp" />
-
             <EditText
                 android:id="@+id/etName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="16dp"
                 android:background="@android:color/darker_gray"
                 android:hint="Enter your name"
                 android:inputType="textPersonName"
                 android:padding="12dp" />
 
             <!-- Email Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Email"
-                android:textColor="#000000"
-                android:textSize="16sp" />
-
             <EditText
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="16dp"
                 android:background="@android:color/darker_gray"
                 android:hint="Enter your email"
                 android:inputType="textEmailAddress"
@@ -102,28 +98,29 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:background="@android:color/darker_gray"
-                android:hint="Enter your phone number"
+                android:hint="Enter phone number"
                 android:inputType="phone"
                 android:padding="12dp" />
 
-            <!-- Notification Preference -->
+            <!-- Notifications -->
             <CheckBox
                 android:id="@+id/cbNotifications"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Enable Notifications" />
+                android:text="Enable Notifications"
+                android:layout_marginTop="16dp" />
 
-            <!-- Admin Status (Read-only) -->
+            <!-- Admin Status -->
             <TextView
                 android:id="@+id/tvAdminStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:text="Admin Status: Regular User"
-                android:textColor="#757575" />
+                android:textColor="#757575"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="16dp" />
 
-            <!-- Device ID (Read-only) -->
+            <!-- Device ID -->
             <TextView
                 android:id="@+id/tvDeviceId"
                 android:layout_width="match_parent"
