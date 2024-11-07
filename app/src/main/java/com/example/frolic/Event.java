@@ -199,4 +199,11 @@ public class Event {
     public String getQrHash() {
         return qrHash;
     }
+    public String getOrganizerId() {
+        return organizerId;
+    }
+
+    public void setOrganizerId(String organizerId) {
+        this.organizerId = organizerId;
+    }
 }

@@ -65,6 +65,9 @@ public class EntrantEditProfile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.entrant_edit_profile);
 
+        Button btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
+
         db = FirebaseFirestore.getInstance();
         deviceId = getIntent().getStringExtra("deviceId");
 
