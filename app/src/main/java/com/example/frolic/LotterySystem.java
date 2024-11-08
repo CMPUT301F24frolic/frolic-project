@@ -19,6 +19,13 @@ public class LotterySystem {
     // TODO: Add Javadocs
 
     /**
+     * Constructs a Lottery System as required by Firebase (No-argument constructor needed)
+     */
+    public LotterySystem(){
+
+    }
+
+    /**
      * Constructs a LotterySystem with the specified event and capacity limits.
      *
      * @param lotterySystemId the unique identifier for this lottery system
@@ -40,7 +47,7 @@ public class LotterySystem {
      */
     public ArrayList<String> drawLottery() {
         Collections.shuffle(waitingListIds);
-        int drawLimit = Math.min(waitingListIds.size(), maxAttendees);
+        int drawLimit = Math.min(maxAttendees - (invitedListIds.size() + confirmedListIds.size()), Math.min(waitingListIds.size(), maxAttendees));
 
         for (int i = 0; i < drawLimit; i++) {
             invitedListIds.add(waitingListIds.get(i));
