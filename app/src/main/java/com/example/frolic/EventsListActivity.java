@@ -143,6 +143,7 @@ public class EventsListActivity extends AppCompatActivity {
             holder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(EventsListActivity.this, EventDetailsActivity.class);
                 intent.putExtra("eventId", event.getEventId());
+                intent.putExtra("deviceId", getIntent().getStringExtra("deviceId"));
                 startActivity(intent);
             });
         }
