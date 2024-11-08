@@ -40,7 +40,6 @@ public class ManageEventsActivityTest {
     public void setup() {
         db = FirebaseFirestore.getInstance();
         db.setFirestoreSettings(new FirebaseFirestoreSettings.Builder()
-                .setPersistenceEnabled(false)  // Disable offline persistence for testing
                 .build());
 
         // Launch the activity with a dummy organizer ID
@@ -65,9 +64,9 @@ public class ManageEventsActivityTest {
      */
     @Test
     public void testRecyclerViewItemsPopulated() {
-        // Assumes events have been added to the Firestore collection for the dummy organizer
+
         onView(withId(R.id.rvEvents))
-                .check(matches(not(withText("No events found"))));  // Check that items are displayed
+                .check(matches(not(withText("No events found"))));
     }
 
     /**
@@ -75,7 +74,7 @@ public class ManageEventsActivityTest {
      */
     @Test
     public void testRecyclerViewItemClick() {
-        // Scroll to a position and perform click (Assumes there is data at position 0)
+        // Scroll to a position and perform click
         onView(withId(R.id.rvEvents))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
 
