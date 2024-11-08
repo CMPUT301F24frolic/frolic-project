@@ -73,10 +73,7 @@
         <activity
             android:name=".AdminEventDetailsActivity"
             android:exported="false" />
-        <activity
-            android:name=".AdminProfileDetailsActivity"
-            android:exported="false"
-            android:parentActivityName=".AdminProfilesActivity" />
+
     </application>
 
 
