@@ -49,33 +49,55 @@ public class MainActivity extends AppCompatActivity {
     private void checkExistingUser() {
         progressDialog.show();
 
-        // Check both collections
-        db.collection("entrants").document(deviceId).get()
-                .addOnSuccessListener(entrantDoc -> {
-                    db.collection("organizers").document(deviceId).get()
-                            .addOnSuccessListener(organizerDoc -> {
-                                progressDialog.dismiss();
-                                if (organizerDoc.exists()) {
-                                    startActivity(new Intent(this, OrganizerDashboardActivity.class)
-                                            .putExtra("deviceId", deviceId));
-                                    finish();
-                                } else if (entrantDoc.exists()) {
-                                    startActivity(new Intent(this, EntrantDashboardActivity.class)
-                                            .putExtra("deviceId", deviceId));
-                                    finish();
-                                } else {
-                                    startActivity(new Intent(this, RoleSelectionActivity.class)
-                                            .putExtra("deviceId", deviceId));
-                                    finish();
-                                }
-                            });
-                })
-                .addOnFailureListener(e -> {
-                    progressDialog.dismiss();
-                    Log.e(TAG, "Error checking user", e);
-                    showErrorDialog();
-                });
+        // Instead of checking collections, just go to role selection
+        progressDialog.dismiss();
+        Intent intent = new Intent(this, RoleSelectionActivity.class);
+        intent.putExtra("deviceId", deviceId);
+        startActivity(intent);
+        finish();
+
+    /* Original code commented out for reference
+    db.collection("entrants").document(deviceId).get()
+            .addOnSuccessListener(entrantDoc -> {
+                db.collection("organizers").document(deviceId).get()
+                        .addOnSuccessListener(organizerDoc -> {
+                            db.collection("admins").document(deviceId).get()
+                                    .addOnSuccessListener(adminDoc -> {
+                                        progressDialog.dismiss();
+                                        if (adminDoc.exists()) {
+                                            startActivity(new Intent(this, AdminDashboardActivity.class)
+                                                    .putExtra("deviceId", deviceId));
+                                            finish();
+                                        } else if (organizerDoc.exists()) {
+                                            startActivity(new Intent(this, OrganizerDashboardActivity.class)
+                                                    .putExtra("deviceId", deviceId));
+                                            finish();
+                                        } else if (entrantDoc.exists()) {
+                                            startActivity(new Intent(this, EntrantDashboardActivity.class)
+                                                    .putExtra("deviceId", deviceId));
+                                            finish();
+                                        } else {
+                                            startActivity(new Intent(this, RoleSelectionActivity.class)
+                                                    .putExtra("deviceId", deviceId));
+                                            finish();
+                                        }
+                                    });
+                        });
+            })
+            .addOnFailureListener(e -> {
+                progressDialog.dismiss();
+                Log.e(TAG, "Error checking user", e);
+                showErrorDialog();
+            });
+    */
     }
+
+    private void handleError(Exception e) {
+        progressDialog.dismiss();
+        Log.e(TAG, "Error checking user", e);
+        showErrorDialog();
+    }
+
 
     /**
      * Shows error dialog with retry option when database access fails.
