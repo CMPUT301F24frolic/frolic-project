@@ -18,6 +18,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * EntrantDetailsActivity displays details for an event's entrants, including counts for
@@ -83,8 +85,13 @@ public class EntrantDetailsActivity extends AppCompatActivity {
         btnPickEntrants.setOnClickListener(v -> pickEntrants());
     }
 
+
+    /**
+     * Picks the entrants from the Firebase document and removes them from the waiting list.
+     * Also updates the Firebase LotterySystem document to reflect the changes.
+     */
     private void pickEntrants() {
-        db.collection("lotteries").document(eventId) // Use "lotteries" here
+        db.collection("lotteries").document(eventId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
@@ -95,22 +102,26 @@ public class EntrantDetailsActivity extends AppCompatActivity {
                             return;
                         }
 
-                        // Call the lottery draw method to update the lists
                         lottery.drawLottery();
 
                         ArrayList<String> inviteds = lottery.getInvitedListIds();
+                        ArrayList<String> waitings = lottery.getWaitingListIds();
 
-                        for(int i = 0; i < inviteds.size(); i++) {
+                        for (int i = 0; i < inviteds.size(); i++) {
                             Log.d("", "" + inviteds.get(i));
                         }
-                        // Update Firestore with the modified lists
-                        db.collection("lotteries").document(eventId) // Ensure "lotteries" here too
-                                .set(lottery)
+
+                        Map<String, Object> updates = new HashMap<>();
+                        updates.put("invitedListIds", inviteds);
+                        updates.put("waitingListIds", waitings);
+
+                        db.collection("lotteries").document(eventId)
+                                .update(updates)
                                 .addOnSuccessListener(aVoid -> {
-                                    Log.d("PickEntrants", "LotterySystem updated successfully");
+                                    Log.d("PickEntrants", "invitedListIds updated successfully");
                                     loadEntrantDetails();
                                 })
-                                .addOnFailureListener(e -> Log.e("PickEntrants", "Error updating LotterySystem", e));
+                                .addOnFailureListener(e -> Log.e("PickEntrants", "Error updating invitedListIds", e));
 
                         Log.d("PickEntrants", "Max attendees: " + lottery.getMaxAttendees());
                     } else {
