@@ -63,7 +63,10 @@ public class AdminDashboardActivity extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-        // Do nothing to disable back button
+        Toast.makeText(this,
+                "Please use the menu options to navigate",
+                Toast.LENGTH_SHORT).show();
+        super.onBackPressed();
     }
 
     /**
