@@ -61,6 +61,22 @@
         <activity android:name=".EventDetailsActivity" />
         <activity android:name=".QRScanActivity" android:exported="false" />
         <activity android:name=".EventsListActivity" android:exported="false" />
+        <activity
+            android:name=".AdminDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminEventsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminProfilesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminEventDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminProfileDetailsActivity"
+            android:exported="false"
+            android:parentActivityName=".AdminProfilesActivity" />
     </application>
 
 
