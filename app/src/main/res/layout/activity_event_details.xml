@@ -29,12 +29,49 @@
         android:textSize="16sp"
         android:layout_marginTop="8dp" />
 
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Status"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/btnWait"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Join Waiting List" />
+
+    <Button
+        android:id="@+id/btnLeave"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Leave Waiting List" />
+
+    <Button
+        android:id="@+id/btnJoin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Join Event" />
+
+    <Button
+        android:id="@+id/btnDecline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Decline Invitation" />
+
     <Button
         android:id="@+id/btnBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Back"
         android:layout_marginTop="16dp" />
+
 </LinearLayout>
 
 
