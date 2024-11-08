@@ -92,6 +92,30 @@ public class LotterySystem {
     }
 
     /**
+     * Removes an entrant from the event's invited list if they exist on the list.
+     *
+     * @param entrantId the id of the entrant to be removed from the invited list
+     * @return {@code true} if the entrant was successfully removed;
+     *         {@code false} if the entrant was not found in the invited list
+     * @throws AssertionError if the entrant is not in the invited list,
+     *                        logs an error indicating the removal attempt for a non-existent entrant
+     */
+    public boolean removeFromInvitedList(String entrantId) {
+        try { assert invitedListIds.contains(entrantId); }
+        catch (AssertionError e) { Log.e("LotterySystem.java", "Tried to remove a user that doesn't exist form the invited list", e); }
+        return invitedListIds.remove(entrantId);
+    }
+
+    /**
+     * Adds an entrant to the event's canceled list.
+     *
+     * @param entrantId the id of the entrant to be added to the waiting list
+     */
+    public boolean addToCanceledList(String entrantId) {
+        return canceledListIds.add(entrantId);
+    }
+
+    /**
      * Converts this LotterySystem object to a map representation for Firebase storage.
      *
      * @return a map containing the lottery system's attributes and their values
