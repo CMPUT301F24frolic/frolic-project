@@ -78,7 +78,5 @@ public class EntrantProfileActivityTest {
         // Perform a click on the view events button
         onView(withId(R.id.btnViewEvent)).perform(click());
 
-        // Check if it goes to the appropriate page or triggers the correct action
-        // Add further checks here based on your view events page logic
     }
 }

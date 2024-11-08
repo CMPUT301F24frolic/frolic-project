@@ -8,13 +8,7 @@ import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
-import static org.hamcrest.Matchers.notNullValue;
-import static java.util.regex.Pattern.matches;
-
-import android.app.Activity;
-import android.app.Instrumentation;
 import android.content.Intent;
-import android.net.Uri;
 
 import androidx.test.espresso.intent.Intents;
 import androidx.test.rule.ActivityTestRule;
@@ -29,14 +23,8 @@ public class EntrantSignUpActivityTest {
     public ActivityTestRule<EntrantSignUpActivity> activityRule =
             new ActivityTestRule<>(EntrantSignUpActivity.class, true, false);
 
-    private Uri dummyImageUri;
 
     @Before
-    public void setUp() {
-        Intents.init();
-        // Create a dummy Uri for image selection
-        dummyImageUri = Uri.parse("android.resource://com.example.frolic/drawable/ic_profile");
-    }
 
     @After
     public void tearDown() {
@@ -71,7 +59,6 @@ public class EntrantSignUpActivityTest {
         // Simulate clicking the "Add Profile Image" button
         onView(withId(R.id.btnAddProfileImage)).perform(click());
 
-        // Verify that an intent to open image selector is triggered
         //intended(Intent.ACTION_GET_CONTENT);
     }
 
