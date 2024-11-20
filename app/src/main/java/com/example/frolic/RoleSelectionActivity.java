@@ -85,6 +85,7 @@ public class RoleSelectionActivity extends AppCompatActivity {
             Intent intent = new Intent(this, EntrantEditProfile.class);
             intent.putExtra("deviceId", deviceId);
             intent.putExtra("role", "ENTRANT");
+            intent.putExtra("fromRoleSelection", true);
             startActivity(intent);
             finish();
         });
@@ -94,6 +95,7 @@ public class RoleSelectionActivity extends AppCompatActivity {
             Intent intent = new Intent(this, OrganizerEditProfile.class);
             intent.putExtra("deviceId", deviceId);
             intent.putExtra("role", "ORGANIZER");
+            intent.putExtra("fromRoleSelection", true);
             startActivity(intent);
             finish();
         });

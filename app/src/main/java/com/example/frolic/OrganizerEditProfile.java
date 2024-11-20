@@ -44,6 +44,7 @@ public class OrganizerEditProfile extends AppCompatActivity {
     private FirebaseFirestore db;
     private String deviceId;
     private Uri selectedImageUri;
+    private Button btnBack;
 
     // Profile UI elements
     private ImageView ivProfileImage;
@@ -79,8 +80,10 @@ public class OrganizerEditProfile extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         deviceId = getIntent().getStringExtra("deviceId");
 
+        boolean fromRoleSelection = getIntent().getBooleanExtra("fromRoleSelection", false);
+
         initializeViews();
-        setupClickListeners();
+        setupClickListeners(fromRoleSelection);
         loadExistingData();
     }
 
@@ -97,6 +100,7 @@ public class OrganizerEditProfile extends AppCompatActivity {
         cbNotifications = findViewById(R.id.cbNotifications);
         btnUploadImage = findViewById(R.id.btnUploadImage);
         btnSaveProfile = findViewById(R.id.btnSaveProfile);
+        btnBack = findViewById(R.id.btnBackOrganizer);
 
         // Facility views
         etFacilityName = findViewById(R.id.etFacilityName);
@@ -106,9 +110,23 @@ public class OrganizerEditProfile extends AppCompatActivity {
     /**
      * Sets up click listeners for buttons and interactive elements.
      */
-    private void setupClickListeners() {
+    private void setupClickListeners(boolean fromRoleSelection) {
         btnUploadImage.setOnClickListener(v -> checkPermissionAndPickImage());
         btnSaveProfile.setOnClickListener(v -> validateAndSaveProfile());
+        btnBack.setOnClickListener(v -> {
+            if (fromRoleSelection) {
+                // Navigate back to RoleSelectionActivity
+                Intent intent = new Intent(this, RoleSelectionActivity.class);
+                intent.putExtra("deviceId", deviceId);
+                startActivity(intent);
+            } else {
+                // Navigate back to EntrantDashboardActivity
+                Intent intent = new Intent(this, EntrantDashboardActivity.class);
+                intent.putExtra("deviceId", deviceId);
+                startActivity(intent);
+            }
+            finish();
+        });
     }
 
     /**
@@ -421,4 +439,15 @@ public class OrganizerEditProfile extends AppCompatActivity {
             }
         }
     }
+
+    /**
+     * Navigates back to the RoleSelectionActivity.
+     */
+    private void navigateBackToRoleSelection() {
+        Intent intent = new Intent(this, RoleSelectionActivity.class);
+        intent.putExtra("deviceId", deviceId);
+        startActivity(intent);
+        finish();
+    }
+
 }

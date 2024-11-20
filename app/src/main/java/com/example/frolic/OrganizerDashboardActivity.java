@@ -121,6 +121,7 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
                     .addOnSuccessListener(queryDocuments -> {
                         Intent intent = new Intent(this, OrganizerEditProfile.class);
                         intent.putExtra("deviceId", deviceId);
+                        intent.putExtra("fromRoleSelection", false);
                         if (!queryDocuments.isEmpty()) {
                             // Facility exists, pass its ID for editing
                             String facilityId = queryDocuments.getDocuments().get(0).getId();

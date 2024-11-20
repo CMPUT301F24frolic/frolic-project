@@ -104,6 +104,7 @@ public class EntrantDashboardActivity extends AppCompatActivity {
         profile.setOnClickListener(v -> {
             Intent intent = new Intent(this, EntrantEditProfile.class);
             intent.putExtra("deviceId", getIntent().getStringExtra("deviceId"));
+            intent.putExtra("fromRoleSelection", false);
             startActivity(intent);
         });
 
