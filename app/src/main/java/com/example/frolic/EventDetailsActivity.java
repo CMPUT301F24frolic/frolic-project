@@ -105,9 +105,8 @@ public class EventDetailsActivity extends AppCompatActivity {
                                     lottery.removeFromInvitedList(deviceId);
                                     Map<String, Object> lotteryUpdates = new HashMap<>();
                                     lotteryUpdates.put("invitedListIds", lottery.getInvitedListIds());
-                                    event.addEntrantId(deviceId);
-                                    Map<String, Object> eventUpdates = new HashMap<>();
-                                    eventUpdates.put("entrantIds", event.getEntrantIds());
+                                    lottery.addToConfirmedList(deviceId);
+                                    lotteryUpdates.put("confirmedListIds", lottery.getConfirmedListIds());
 
                                     db.collection("lotteries").document(eventId)
                                             .update(lotteryUpdates)
@@ -116,14 +115,6 @@ public class EventDetailsActivity extends AppCompatActivity {
                                                 loadEventDetails(eventId);
                                             })
                                             .addOnFailureListener(e -> Log.e("joinEntrantsList", "Error updating invitedList", e));
-
-                                    db.collection("events").document(eventId)
-                                            .update(eventUpdates)
-                                            .addOnSuccessListener(aVoid -> {
-                                                Log.d("joinEntrantsList", "entrantIds updated successfully");
-                                                loadEventDetails(eventId);
-                                            })
-                                            .addOnFailureListener(e -> Log.e("joinEntrantsList", "Error updating entrantIds", e));
                                 });
 
                                 btnDecline.setOnClickListener(v -> {
@@ -143,7 +134,7 @@ public class EventDetailsActivity extends AppCompatActivity {
 
                                 });
                             }
-                            else if (event.getEntrantIds().contains(deviceId)) {
+                            else if (lottery.getConfirmedListIds().contains(deviceId)) {
                                 // User is already an entrant
                                 tvStatus.setText("Status: Entrant");
                             }

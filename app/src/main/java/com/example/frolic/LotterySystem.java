@@ -116,6 +116,13 @@ public class LotterySystem {
     }
 
     /**
+     * Adds an entrant to the event's confirmed list.
+     *
+     * @param entrantId the id of the entrant to be added to the confirmed list
+     */
+    public boolean addToConfirmedList(String entrantId) { return confirmedListIds.add(entrantId);}
+
+    /**
      * Converts this LotterySystem object to a map representation for Firebase storage.
      *
      * @return a map containing the lottery system's attributes and their values
