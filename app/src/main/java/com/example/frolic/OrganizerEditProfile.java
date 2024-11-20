@@ -440,14 +440,4 @@ public class OrganizerEditProfile extends AppCompatActivity {
         }
     }
 
-    /**
-     * Navigates back to the RoleSelectionActivity.
-     */
-    private void navigateBackToRoleSelection() {
-        Intent intent = new Intent(this, RoleSelectionActivity.class);
-        intent.putExtra("deviceId", deviceId);
-        startActivity(intent);
-        finish();
-    }
-
 }
