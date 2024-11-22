@@ -48,7 +48,7 @@ public class EntrantEditProfile extends AppCompatActivity {
     private EditText etName, etEmail, etPhone;
     private CheckBox cbNotifications;
     private TextView tvAdminStatus, tvDeviceId;
-    private Button btnUploadImage, btnSaveChanges;
+    private Button btnUploadImage, btnSaveChanges, btnBack;
 
     private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -65,14 +65,14 @@ public class EntrantEditProfile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.entrant_edit_profile);
 
-        Button btnBack = findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(v -> finish());
 
         db = FirebaseFirestore.getInstance();
         deviceId = getIntent().getStringExtra("deviceId");
 
+        boolean fromRoleSelection = getIntent().getBooleanExtra("fromRoleSelection", false);
+
         initializeViews();
-        setupClickListeners();
+        setupClickListeners(fromRoleSelection);
         loadExistingData();
     }
 
@@ -86,13 +86,28 @@ public class EntrantEditProfile extends AppCompatActivity {
         tvDeviceId = findViewById(R.id.tvDeviceId);
         btnUploadImage = findViewById(R.id.btnUploadImage);
         btnSaveChanges = findViewById(R.id.btnSaveChanges);
+        btnBack = findViewById(R.id.btnBack);
 
         tvDeviceId.setText("Device ID: " + deviceId);
     }
 
-    private void setupClickListeners() {
+    private void setupClickListeners(boolean fromRoleSelection) {
         btnUploadImage.setOnClickListener(v -> checkPermissionAndPickImage());
         btnSaveChanges.setOnClickListener(v -> validateAndSaveProfile());
+        btnBack.setOnClickListener(v -> {
+            if (fromRoleSelection) {
+                // Navigate back to RoleSelectionActivity
+                Intent intent = new Intent(this, RoleSelectionActivity.class);
+                intent.putExtra("deviceId", deviceId);
+                startActivity(intent);
+            } else {
+                // Navigate back to EntrantDashboardActivity
+                Intent intent = new Intent(this, EntrantDashboardActivity.class);
+                intent.putExtra("deviceId", deviceId);
+                startActivity(intent);
+            }
+            finish();
+        });
     }
 
     private void loadExistingData() {
@@ -280,4 +295,5 @@ public class EntrantEditProfile extends AppCompatActivity {
             }
         }
     }
+
 }
