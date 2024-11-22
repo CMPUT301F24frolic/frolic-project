@@ -17,6 +17,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
     private static final String TAG = "AdminDashboardActivity";
     private FirebaseFirestore db;
     private String deviceId;
+    private Button btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +44,15 @@ public class AdminDashboardActivity extends AppCompatActivity {
     private void setupUI() {
         TextView manageEvents = findViewById(R.id.tvManageEvents);
         TextView manageProfiles = findViewById(R.id.tvManageProfiles);
+        btnBack = findViewById(R.id.tvBack);
         // Removing back button functionality as requested
+
+        btnBack.setOnClickListener(v -> {
+            Intent intent = new Intent(this, RoleSelectionActivity.class);
+            intent.putExtra("deviceId", deviceId);
+            startActivity(intent);
+            finish();
+        });
 
         manageEvents.setOnClickListener(v -> {
             Intent intent = new Intent(this, AdminEventsActivity.class);
