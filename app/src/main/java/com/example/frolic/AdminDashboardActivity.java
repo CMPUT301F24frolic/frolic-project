@@ -3,7 +3,6 @@ package com.example.frolic;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,7 +10,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * Activity providing the main dashboard interface for admin users.
- * Allows access to event management, profile management, and other admin functions.
+ * Allows access to event management, profile management, and facility management functions.
  */
 public class AdminDashboardActivity extends AppCompatActivity {
     private static final String TAG = "AdminDashboardActivity";
@@ -43,7 +42,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
     private void setupUI() {
         TextView manageEvents = findViewById(R.id.tvManageEvents);
         TextView manageProfiles = findViewById(R.id.tvManageProfiles);
-        // Removing back button functionality as requested
+        TextView manageFacilities = findViewById(R.id.tvManageFacilities);
 
         manageEvents.setOnClickListener(v -> {
             Intent intent = new Intent(this, AdminEventsActivity.class);
@@ -56,17 +55,19 @@ public class AdminDashboardActivity extends AppCompatActivity {
             intent.putExtra("deviceId", deviceId);
             startActivity(intent);
         });
+
+        manageFacilities.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AdminFacilitiesActivity.class);
+            intent.putExtra("deviceId", deviceId);
+            startActivity(intent);
+        });
     }
 
-    /**
-     * Prevents going back from the admin dashboard
-     */
     @Override
     public void onBackPressed() {
         Toast.makeText(this,
                 "Please use the menu options to navigate",
                 Toast.LENGTH_SHORT).show();
-        super.onBackPressed();
     }
 
     /**

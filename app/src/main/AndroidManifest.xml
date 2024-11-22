@@ -71,8 +71,9 @@
             android:name=".AdminProfilesActivity"
             android:exported="false" />
         <activity
-            android:name=".AdminEventDetailsActivity"
+            android:name=".AdminFacilitiesActivity"
             android:exported="false" />
+
 
     </application>
 
