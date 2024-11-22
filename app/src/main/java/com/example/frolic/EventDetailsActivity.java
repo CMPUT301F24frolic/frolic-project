@@ -46,6 +46,13 @@ public class EventDetailsActivity extends AppCompatActivity {
         // Get eventId from Intent extras
         eventId = getIntent().getStringExtra("eventId");
 
+        // Retrieve event details from Intent
+        String eventName = getIntent().getStringExtra("eventName");
+        String organizerId = getIntent().getStringExtra("organizerId");
+
+        // Display event details
+        tvEventName.setText(eventName != null ? eventName : "No event name available");
+
         // Load event details from Firestore
         if (eventId != null) {
             loadEventDetails(eventId);
