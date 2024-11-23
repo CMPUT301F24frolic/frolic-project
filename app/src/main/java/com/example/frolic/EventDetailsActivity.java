@@ -1,6 +1,7 @@
 package com.example.frolic;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
@@ -214,62 +215,72 @@ public class EventDetailsActivity extends AppCompatActivity {
      * @param deviceId The device ID of the user attempting to join the waiting list.
      */
     private void checkLocationPermissionAndJoinWaitlist(LotterySystem lottery, String deviceId) {
-        // Check if location permissions are granted
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        // Show a warning dialog to the user
+        new AlertDialog.Builder(this)
+                .setTitle("Location Required")
+                .setMessage("This event requires your location to join the waiting list. Your location will be stored securely and used only for this event.")
+                .setPositiveButton("Proceed", (dialog, which) -> {
+                    // Check if location permissions are granted
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            // Request location permissions
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
-                    LOCATION_PERMISSION_REQUEST_CODE);
-            return;
-        }
-
-        // Check if location services are enabled
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            Toast.makeText(this, "Please enable location services to join the waiting list.", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-            return;
-        }
-
-        // Retrieve the user's current location
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(location -> {
-                    if (location != null) {
-                        double latitude = location.getLatitude();
-                        double longitude = location.getLongitude();
-
-                        // Add the entrant to the waiting list
-                        if (lottery.addToWaitingList(deviceId)) {
-                            Map<String, Object> updates = new HashMap<>();
-                            updates.put("waitingListIds", lottery.getWaitingListIds());
-
-                            updates.put("entrantLocations." + deviceId, new GeoPoint(latitude, longitude));
-
-                            db.collection("lotteries").document(eventId)
-                                    .update(updates)
-                                    .addOnSuccessListener(aVoid -> {
-                                        Log.d("joinWaitingList", "Waiting list and location updated successfully");
-                                        Toast.makeText(this, "Successfully joined the waiting list with location!", Toast.LENGTH_SHORT).show();
-                                        loadEventDetails(eventId);
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Log.e("joinWaitingList", "Error updating waiting list or location", e);
-                                        Toast.makeText(this, "Error joining the waiting list.", Toast.LENGTH_SHORT).show();
-                                    });
-                        } else {
-                            Toast.makeText(this, "Waiting list is full!", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(this, "Unable to retrieve location. Please try again.", Toast.LENGTH_SHORT).show();
+                        // Request location permissions
+                        ActivityCompat.requestPermissions(this,
+                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                                LOCATION_PERMISSION_REQUEST_CODE);
+                        return;
                     }
+
+                    // Check if location services are enabled
+                    LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                    if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                        Toast.makeText(this, "Please enable location services to join the waiting list.", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        return;
+                    }
+
+                    // Retrieve the user's current location
+                    fusedLocationClient.getLastLocation()
+                            .addOnSuccessListener(location -> {
+                                if (location != null) {
+                                    double latitude = location.getLatitude();
+                                    double longitude = location.getLongitude();
+
+                                    // Add the entrant to the waiting list
+                                    if (lottery.addToWaitingList(deviceId)) {
+                                        Map<String, Object> updates = new HashMap<>();
+                                        updates.put("waitingListIds", lottery.getWaitingListIds());
+
+                                        // Save location to Firestore alongside waiting list update
+                                        updates.put("entrantLocations." + deviceId, new GeoPoint(latitude, longitude));
+
+                                        db.collection("lotteries").document(eventId)
+                                                .update(updates)
+                                                .addOnSuccessListener(aVoid -> {
+                                                    Log.d("joinWaitingList", "Waiting list and location updated successfully");
+                                                    Toast.makeText(this, "Successfully joined the waiting list with location!", Toast.LENGTH_SHORT).show();
+                                                    loadEventDetails(eventId);
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Log.e("joinWaitingList", "Error updating waiting list or location", e);
+                                                    Toast.makeText(this, "Error joining the waiting list.", Toast.LENGTH_SHORT).show();
+                                                });
+                                    } else {
+                                        Toast.makeText(this, "Waiting list is full!", Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    Toast.makeText(this, "Unable to retrieve location. Please try again.", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("LocationError", "Error retrieving location", e);
+                                Toast.makeText(this, "Error retrieving your location. Please try again.", Toast.LENGTH_SHORT).show();
+                            });
                 })
-                .addOnFailureListener(e -> {
-                    Log.e("LocationError", "Error retrieving location", e);
-                    Toast.makeText(this, "Error retrieving your location. Please try again.", Toast.LENGTH_SHORT).show();
-                });
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
     }
+
 
     /**
      * Fetches the organizer's name using the organizerId from the Identity collection.
