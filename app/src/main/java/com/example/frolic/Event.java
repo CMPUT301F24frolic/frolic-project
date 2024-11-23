@@ -206,4 +206,5 @@ public class Event {
     public void setOrganizerId(String organizerId) {
         this.organizerId = organizerId;
     }
+    public void setQrHash(String qrHash) { this.qrHash = qrHash; }
 }

@@ -44,8 +44,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
     private void setupUI() {
         TextView manageEvents = findViewById(R.id.tvManageEvents);
         TextView manageProfiles = findViewById(R.id.tvManageProfiles);
+        TextView manageFacilities = findViewById(R.id.tvManageFacilities);
         btnBack = findViewById(R.id.tvBack);
-        // Removing back button functionality as requested
 
         btnBack.setOnClickListener(v -> {
             Intent intent = new Intent(this, RoleSelectionActivity.class);
@@ -65,18 +65,15 @@ public class AdminDashboardActivity extends AppCompatActivity {
             intent.putExtra("deviceId", deviceId);
             startActivity(intent);
         });
+
+        manageFacilities.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AdminFacilitiesActivity.class);
+            intent.putExtra("deviceId", deviceId);
+            startActivity(intent);
+        });
     }
 
-    /**
-     * Prevents going back from the admin dashboard
-     */
-    @Override
-    public void onBackPressed() {
-        Toast.makeText(this,
-                "Please use the menu options to navigate",
-                Toast.LENGTH_SHORT).show();
-        super.onBackPressed();
-    }
+
 
     /**
      * Verifies that the current user has admin privileges by checking the admin flag
