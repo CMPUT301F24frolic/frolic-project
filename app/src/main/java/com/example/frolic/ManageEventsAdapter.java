@@ -92,7 +92,7 @@ public class ManageEventsAdapter extends RecyclerView.Adapter<ManageEventsAdapte
             holder.iconViewMap.setVisibility(View.VISIBLE);
             holder.iconMapLabel.setVisibility(View.VISIBLE);
             holder.iconViewMap.setOnClickListener(v -> {
-                Intent intent = new Intent(context, MapViewActivity.class);
+                Intent intent = new Intent(context, MapsActivity.class);
                 intent.putExtra("eventId", event.getEventId());
                 context.startActivity(intent);
             });
