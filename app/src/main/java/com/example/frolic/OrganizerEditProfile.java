@@ -254,6 +254,16 @@ public class OrganizerEditProfile extends AppCompatActivity {
         if (email.isEmpty()) {
             etEmail.setError("Email is required");
             return;
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            etEmail.setError("Invalid email format");
+            return;
+        }
+        // Validate Phone Number (only if provided)
+        if (!phoneStr.isEmpty()) {
+            if (!phoneStr.matches("\\d{9,}")) { // Ensures at least 9 digits
+                etPhone.setError("Phone number must be at least 9 digits");
+                return;
+            }
         }
         if (facilityName.isEmpty()) {
             etFacilityName.setError("Facility name is required");
