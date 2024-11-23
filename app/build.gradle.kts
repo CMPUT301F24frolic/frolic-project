@@ -64,16 +64,19 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation ("com.google.android.gms:play-services-maps:18.1.0")
     implementation ("com.google.android.gms:play-services-location:21.0.1")
+    implementation(libs.androidx.junit)
 
     // Testing libraries
     //testImplementation("junit:junit:4.13.2")
+    // Testing libraries
+    testImplementation("junit:junit:4.13.2")
     testImplementation(libs.androidx.junit)
     testImplementation(libs.junit.jupiter)
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1") // Match Espresso core version
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.0.1")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.0.1")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
-
 }

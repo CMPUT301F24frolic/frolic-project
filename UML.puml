@@ -1,0 +1,677 @@
+@startuml
+class com.example.frolic.Entrant {
+- Identity identity
+- ArrayList<Event> eventsEntered
++ ArrayList<Event> getEventsEntered()
++ void setEventsEntered(ArrayList<Event>)
++ Identity getIdentity()
++ void setIdentity(Identity)
+}
+
+
+class com.example.frolic.CanceledEntrantsActivity {
+- TextView tvBack
+- RecyclerView rvEntrants
+- EntrantsAdapter adapter
+- ArrayList<String> canceledEntrantIds
+# void onCreate(Bundle)
+- void updateCountDisplay()
+}
+
+
+class com.example.frolic.EventDetailsActivity {
+- {static} String TAG
+- TextView tvEventName
+- Button btnWait
+- FirebaseFirestore db
+- String eventId
+# void onCreate(Bundle)
+- void loadEventDetails(String)
+- void fetchOrganizerName(String)
+}
+
+
+class com.example.frolic.EntrantsAdapter {
+- ArrayList<String> entrantIds
+- FirebaseFirestore db
++ EntrantViewHolder onCreateViewHolder(ViewGroup,int)
++ void onBindViewHolder(EntrantViewHolder,int)
++ int getItemCount()
++ void updateEntrantsList(ArrayList<String>)
+}
+
+
+class com.example.frolic.EntrantsAdapter$EntrantViewHolder {
+~ TextView tvEntrantName
+}
+
+class com.example.frolic.AdminEventsAdapter {
+- ArrayList<Event> events
+- OnEventActionListener listener
++ ViewHolder onCreateViewHolder(ViewGroup,int)
++ void onBindViewHolder(ViewHolder,int)
++ int getItemCount()
++ void updateEvents(ArrayList<Event>)
+}
+
+
+interface com.example.frolic.AdminEventsAdapter$OnEventActionListener {
+~ void onEventDeleted(String)
+~ void onEventSelected(Event)
+}
+
+class com.example.frolic.AdminEventsAdapter$ViewHolder {
+~ TextView tvEventName
+~ TextView tvOrganizerName
+}
+
+class com.example.frolic.Event {
+- String eventId
+- String organizerId
+- String facilityId
+- String eventName
+- ArrayList<String> entrantIds
+- int waitlistLimit
+- int maxConfirmed
+- Date eventDate
+- Date enrollDate
+- String lotterySystemId
+- boolean geolocationRequired
+- boolean receiveNotification
+- String qrHash
++ Map<String,Object> toMap()
++ void addEntrantId(String)
++ boolean removeEntrantId(String)
++ Bitmap getEventQRCode()
++ String getEventName()
++ void setEventName(String)
++ ArrayList<String> getEntrantIds()
++ void setEntrantIds(ArrayList<String>)
++ String getFacilityId()
++ void setFacilityId(String)
++ int getMaxConfirmed()
++ void setMaxConfirmed(int)
++ Date getEventDate()
++ void setEventDate(Date)
++ Date getEnrollDate()
++ void setEnrollDate(Date)
++ String getLotterySystemId()
++ int getWaitlistLimit()
++ void setWaitlistLimit(int)
++ boolean isGeolocationRequired()
++ void setGeolocationRequired(boolean)
++ String getEventId()
++ boolean isReceiveNotification()
++ void setReceiveNotification(boolean)
++ String getQrHash()
++ String getOrganizerId()
++ void setOrganizerId(String)
+}
+
+
+class com.example.frolic.MainActivity {
+- {static} String TAG
+- FirebaseFirestore db
+- String deviceId
+- ProgressDialog progressDialog
+# void onCreate(Bundle)
+- void setupProgressDialog()
+- void checkExistingUser()
+- void handleError(Exception)
+- void showErrorDialog()
+- void navigateBasedOnRole(DocumentSnapshot)
+# void onDestroy()
+}
+
+
+class com.example.frolic.UpdateEventActivity {
+- String eventId
+# void onCreate(Bundle)
+}
+
+
+class com.example.frolic.LotterySystem {
+- String lotterySystemId
+- String eventId
+- ArrayList<String> waitingListIds
+- ArrayList<String> invitedListIds
+- ArrayList<String> confirmedListIds
+- ArrayList<String> canceledListIds
+- int maxAttendees
+- int maxWaiting
++ ArrayList<String> drawLottery()
++ boolean addToWaitingList(String)
++ boolean removeFromWaitingList(String)
++ boolean removeFromInvitedList(String)
++ boolean addToCanceledList(String)
++ Map<String,Object> toMap()
++ ArrayList<String> getWaitingListIds()
++ ArrayList<String> getInvitedListIds()
++ ArrayList<String> getConfirmedListIds()
++ ArrayList<String> getCanceledListIds()
++ String getEventId()
++ String getLotterySystemId()
++ int getMaxAttendees()
++ void setMaxAttendees(int)
++ int getMaxWaiting()
++ void setMaxWaiting(int)
+}
+
+
+class com.example.frolic.ManageEventsActivity {
+- FirebaseFirestore db
+- RecyclerView rvEvents
+- ManageEventsAdapter adapter
+- List<Event> eventList
+- String organizerId
+# void onCreate(Bundle)
+- void loadEvents()
+}
+
+
+class com.example.frolic.MapViewActivity {
+- String eventId
+# void onCreate(Bundle)
+}
+
+
+class com.example.frolic.Facility {
+- Organizer organizer
+- String name
+- String address
+- String id
++ Organizer getOrganizer()
++ void setOrganizer(Organizer)
++ String getName()
++ void setName(String)
++ String getAddress()
++ void setAddress(String)
++ String getId()
++ void setId(String)
+}
+
+
+class com.example.frolic.AdminEventDetailsActivity {
+- {static} String TAG
+- String eventId
+- FirebaseFirestore db
+- TextView tvTitle
+- TextView tvEventDate
+- TextView tvEventDescription
+# void onCreate(Bundle)
+- void initializeViews()
+- void setupClickListeners()
+- void showDeleteConfirmation()
+- void loadEventDetails()
+- void updateUI(Event)
+- void deleteEvent()
+}
+
+
+class com.example.frolic.AdminProfilesAdapter {
+- ArrayList<Identity> profiles
+- OnProfileActionListener listener
+- Context context
++ ViewHolder onCreateViewHolder(ViewGroup,int)
++ void onBindViewHolder(ViewHolder,int)
++ int getItemCount()
++ void updateProfiles(ArrayList<Identity>)
+- void showProfileDetails(Identity)
+}
+
+
+interface com.example.frolic.AdminProfilesAdapter$OnProfileActionListener {
+~ void onProfileDeleted(String,String)
+~ void onProfileSelected(Identity)
+}
+
+class com.example.frolic.AdminProfilesAdapter$ViewHolder {
+~ TextView tvEntrantName
+~ TextView tvEntrantEmail
+}
+
+class com.example.frolic.QRCodeGenerator {
++ {static} Bitmap generateQRCode(String)
+}
+
+class com.example.frolic.EntrantSignUpActivity {
+- EditText nameEditText
+- ImageView profileImageView
+- Button saveChangesButton
+- {static} int PICK_IMAGE_REQUEST
+- Uri selectedImageUri
+# void onCreate(Bundle)
+- void openImageSelector()
+# void onActivityResult(int,int,Intent)
+- void saveUserData()
+}
+
+
+class com.example.frolic.EntrantDashboardActivity {
+- {static} String TAG
+- FirebaseFirestore db
+# void onCreate(Bundle)
++ boolean onCreateOptionsMenu(Menu)
++ boolean onOptionsItemSelected(MenuItem)
+- void setupNavigationOptions()
+- void showRoleSwitchDialog()
+- void switchToOrganizerRole()
+}
+
+
+class com.example.frolic.OrganizerEditProfile {
+- {static} String TAG
+- {static} int PERMISSION_REQUEST_CODE
+- FirebaseFirestore db
+- String deviceId
+- Uri selectedImageUri
+- ImageView ivProfileImage
+- EditText etName
+- CheckBox cbNotifications
+- Button btnUploadImage
+- EditText etFacilityName
+- ActivityResultLauncher<Intent> imagePickerLauncher
+# void onCreate(Bundle)
+- void initializeViews()
+- void setupClickListeners()
+- void loadExistingData()
+- void copyFromEntrantProfile()
+- void loadFacilityData(String)
+- void validateAndSaveProfile()
+- void saveFacility(String,String,String,String,String)
+- void saveProfileData(String,String,String,String)
+- void handleImageInFirestore(Map<String,Object>)
+- void saveToFirestore(Map<String,Object>)
+- void navigateToOrganizerDashboard()
+- void checkPermissionAndPickImage()
+- void launchImagePicker()
+- Bitmap getResizedBitmap(Bitmap,int)
+- String bitmapToBase64(Bitmap)
++ void onRequestPermissionsResult(int,String[],int[])
+}
+
+
+class com.example.frolic.MyEventsActivity {
+- {static} String TAG
+- RecyclerView recyclerView
+- MyEventsAdapter adapter
+- ArrayList<EventWithOrganizer> myEventsList
+- Button btnBack
+- FirebaseFirestore db
+- CollectionReference eventsRef
+- String entrantId
+# void onCreate(Bundle)
+- void loadMyEventsFromFirestore()
+- void fetchOrganizerName(Event,Map<String,String>)
+}
+
+
+class com.example.frolic.MyEventsActivity$EventWithOrganizer {
+~ Event event
+~ String organizerName
+}
+
+class com.example.frolic.MyEventsActivity$MyEventsAdapter {
+- ArrayList<EventWithOrganizer> eventsList
++ MyEventsViewHolder onCreateViewHolder(ViewGroup,int)
++ void onBindViewHolder(MyEventsViewHolder,int)
++ int getItemCount()
+}
+
+
+class com.example.frolic.MyEventsActivity$MyEventsAdapter$MyEventsViewHolder {
+~ TextView eventName
+}
+
+class com.example.frolic.AdminProfilesActivity {
+- {static} String TAG
+- FirebaseFirestore db
+- RecyclerView rvProfiles
+- AdminProfilesAdapter adapter
+- ArrayList<Identity> profileList
+# void onCreate(Bundle)
+- void initializeViews()
+- void setupRecyclerView()
+- void showDeleteConfirmation(String,String)
+- void loadProfiles()
+- void loadUserType(String)
+- void deleteProfile(String,String)
+# void onResume()
+}
+
+
+class com.example.frolic.AdminDashboardActivity {
+- {static} String TAG
+- FirebaseFirestore db
+- String deviceId
+# void onCreate(Bundle)
+- void setupUI()
++ void onBackPressed()
+- void verifyAdminStatus()
+}
+
+
+class com.example.frolic.QRScanActivity {
+- ImageView qrCodeImageView
+- Button scanQRCodeButton
+- Button btnBack
+# void onCreate(Bundle)
+}
+
+
+class com.example.frolic.NotificationsActivity {
+- {static} String TAG
+- RecyclerView recyclerView
+- NotificationsAdapter adapter
+- ArrayList<String> notificationList
+- String deviceId
+- Button btnBack
+- FirebaseFirestore db
+- CollectionReference notificationsRef
+# void onCreate(Bundle)
+- void loadNotifications(String)
+}
+
+
+class com.example.frolic.NotificationsActivity$NotificationsAdapter {
+- ArrayList<String> notifications
++ NotificationViewHolder onCreateViewHolder(ViewGroup,int)
++ void onBindViewHolder(NotificationViewHolder,int)
++ int getItemCount()
+}
+
+
+class com.example.frolic.NotificationsActivity$NotificationsAdapter$NotificationViewHolder {
+~ TextView notificationText
+}
+
+class com.example.frolic.OrganizerDashboardActivity {
+- {static} String TAG
+- FirebaseFirestore db
+- String deviceId
+- String facilityId
+# void onCreate(Bundle)
++ boolean onCreateOptionsMenu(Menu)
++ boolean onOptionsItemSelected(MenuItem)
+- void setupNavigationOptions()
+- void showRoleSwitchDialog()
+- void switchToEntrantRole()
+- void proceedWithRoleSwitch()
+- void showErrorDialog(String)
+}
+
+
+class com.example.frolic.Identity {
+- String deviceID
+- String name
+- String email
+- String role
+- int phoneNumber
+- boolean admin
+- boolean notifications
++ String getName()
++ void setName(String)
++ String getEmail()
++ void setEmail(String)
++ String getRole()
++ void setRole(String)
++ int getPhoneNumber()
++ void setPhoneNumber(int)
++ boolean getAdmin()
++ void setAdmin(boolean)
++ boolean getNotifications()
++ void setNotifications(boolean)
++ String getDeviceID()
++ void setDeviceID(String)
+}
+
+
+class com.example.frolic.ChosenEntrantsActivity {
+- TextView tvBack
+- RecyclerView rvEntrants
+- EntrantsAdapter adapter
+- ArrayList<String> chosenEntrantIds
+# void onCreate(Bundle)
+- void updateCountDisplay()
+}
+
+
+class com.example.frolic.Organizer {
+- Identity identity
+- ArrayList<String> eventsOrganizing
+- Facility facility
++ String getOrganizerId()
++ void organizeEvent(String)
++ ArrayList<String> getEventsOrganizing()
++ void setEventsOrganizing(ArrayList<String>)
++ Facility getFacility()
++ void setFacility(Facility)
++ Identity getIdentity()
++ void setIdentity(Identity)
+}
+
+
+class com.example.frolic.DisplayEventQrCodeActivity {
+- FirebaseFirestore db
+- String eventId
+# void onCreate(Bundle)
+- void retrieveQrHashAndGenerateCode()
+- void displayQrCode(String)
+- void downloadQrCode()
+}
+
+
+class com.example.frolic.EntrantDetailsActivity {
+- TextView tvBack
+- Button btnPickEntrants
+- RecyclerView rvEntrants
+- EntrantsAdapter adapter
+- ArrayList<String> confirmedEntrantIds
+- ArrayList<String> waitingListIds
+- ArrayList<String> chosenListIds
+- ArrayList<String> canceledListIds
+- FirebaseFirestore db
+- String eventId
+# void onCreate(Bundle)
+- void pickEntrants()
+- void loadEntrantDetails()
+- void showFilterMenu(View)
+- boolean onFilterMenuItemClicked(MenuItem)
+}
+
+
+class com.example.frolic.ListEventActivity {
+- FirebaseFirestore db
+- EditText etEventName
+- CheckBox cbGeolocationRequired
+- Button btnListEvent
+- String organizerId
+- Date eventDate
+- Date enrollDate
+- TextWatcher textWatcher
+# void onCreate(Bundle)
+- void initializeDatePickers()
+- void createAndSaveEvent()
+- void initializeLotterySystem(Event,String)
+- void showDatePickerDialog(DateSetListener,Date)
++ void onBackPressed()
+}
+
+
+interface com.example.frolic.ListEventActivity$DateSetListener {
+~ void onDateSet(Date,String)
+}
+
+class com.example.frolic.AdminEventsActivity {
+- {static} String TAG
+- FirebaseFirestore db
+- RecyclerView rvEvents
+- AdminEventsAdapter adapter
+- ArrayList<Event> eventList
+# void onCreate(Bundle)
+- void setupRecyclerView()
+- void loadEvents()
+- void deleteEvent(String)
+}
+
+
+class com.example.frolic.WaitingListActivity {
+- TextView tvBack
+- RecyclerView rvEntrants
+- EntrantsAdapter adapter
+- ArrayList<String> waitingListEntrantIds
+# void onCreate(Bundle)
+- void updateCountDisplay()
+}
+
+
+class com.example.frolic.RoleSelectionActivity {
+- {static} String TAG
+- String deviceId
+- FirebaseFirestore db
+- Button btnEntrant
+- TextView tvTitle
+# void onCreate(Bundle)
+- void initializeViews()
+- void initializeButtons()
+- void checkIfAdmin()
+# void onDestroy()
+}
+
+
+class com.example.frolic.EventsListActivity {
+- {static} String TAG
+- RecyclerView recyclerView
+- EventsAdapter adapter
+- ArrayList<Event> eventsList
+- Map<String,String> organizerNames
+- FirebaseFirestore db
+- CollectionReference eventsRef
+# void onCreate(Bundle)
+- void loadEventsFromFirestore()
+- void fetchOrganizerName(Event)
+}
+
+
+class com.example.frolic.EventsListActivity$EventsAdapter {
+- ArrayList<Event> events
++ EventsViewHolder onCreateViewHolder(ViewGroup,int)
++ void onBindViewHolder(EventsViewHolder,int)
++ int getItemCount()
+}
+
+
+class com.example.frolic.EventsListActivity$EventsAdapter$EventsViewHolder {
+~ TextView eventName
+}
+
+class com.example.frolic.ManageEventsAdapter {
+- List<Event> eventList
+- Context context
++ EventViewHolder onCreateViewHolder(ViewGroup,int)
++ void onBindViewHolder(EventViewHolder,int)
++ int getItemCount()
+}
+
+
+class com.example.frolic.ManageEventsAdapter$EventViewHolder {
+~ TextView tvEventName
+~ ImageView iconViewEntrants
+~ TextView iconEntrantsLabel
+}
+
+class com.example.frolic.EntrantEditProfile {
+- {static} String TAG
+- {static} int PERMISSION_REQUEST_CODE
+- FirebaseFirestore db
+- String deviceId
+- Uri selectedImageUri
+- ImageView ivProfileImage
+- EditText etName
+- CheckBox cbNotifications
+- TextView tvAdminStatus
+- Button btnUploadImage
+- ActivityResultLauncher<Intent> imagePickerLauncher
+# void onCreate(Bundle)
+- void initializeViews()
+- void setupClickListeners()
+- void loadExistingData()
+- void copyFromOrganizerProfile()
+- void checkPermissionAndPickImage()
+- void launchImagePicker()
+- void validateAndSaveProfile()
+- void handleImageInFirestore(Map<String,Object>)
+- Bitmap getResizedBitmap(Bitmap,int)
+- String bitmapToBase64(Bitmap)
+- void saveProfileData(Map<String,Object>)
++ void onRequestPermissionsResult(int,String[],int[])
+}
+
+
+class com.example.frolic.EntrantProfileActivity {
+- TextView nameViewText
+- ImageView profileImageView
+- ImageView profileImageEdit
+- Button editProfileButton
+- {static} int EDIT_PROFILE_REQUEST
+# void onCreate(Bundle)
+}
+
+
+
+
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.CanceledEntrantsActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.EventDetailsActivity
+com.example.frolic.Adapter <|-- com.example.frolic.EntrantsAdapter
+com.example.frolic.EntrantsAdapter +.. com.example.frolic.EntrantsAdapter$EntrantViewHolder
+com.example.frolic.ViewHolder <|-- com.example.frolic.EntrantsAdapter$EntrantViewHolder
+com.example.frolic.Adapter <|-- com.example.frolic.AdminEventsAdapter
+com.example.frolic.AdminEventsAdapter +.. com.example.frolic.AdminEventsAdapter$OnEventActionListener
+com.example.frolic.AdminEventsAdapter +.. com.example.frolic.AdminEventsAdapter$ViewHolder
+com.example.frolic.ViewHolder <|-- com.example.frolic.AdminEventsAdapter$ViewHolder
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.MainActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.UpdateEventActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.ManageEventsActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.MapViewActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.AdminEventDetailsActivity
+com.example.frolic.Adapter <|-- com.example.frolic.AdminProfilesAdapter
+com.example.frolic.AdminProfilesAdapter +.. com.example.frolic.AdminProfilesAdapter$OnProfileActionListener
+com.example.frolic.AdminProfilesAdapter +.. com.example.frolic.AdminProfilesAdapter$ViewHolder
+com.example.frolic.ViewHolder <|-- com.example.frolic.AdminProfilesAdapter$ViewHolder
+android.app.Activity <|-- com.example.frolic.EntrantSignUpActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.EntrantDashboardActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.OrganizerEditProfile
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.MyEventsActivity
+com.example.frolic.MyEventsActivity +.. com.example.frolic.MyEventsActivity$EventWithOrganizer
+com.example.frolic.MyEventsActivity +.. com.example.frolic.MyEventsActivity$MyEventsAdapter
+com.example.frolic.Adapter <|-- com.example.frolic.MyEventsActivity$MyEventsAdapter
+com.example.frolic.MyEventsActivity$MyEventsAdapter +.. com.example.frolic.MyEventsActivity$MyEventsAdapter$MyEventsViewHolder
+com.example.frolic.ViewHolder <|-- com.example.frolic.MyEventsActivity$MyEventsAdapter$MyEventsViewHolder
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.AdminProfilesActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.AdminDashboardActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.QRScanActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.NotificationsActivity
+com.example.frolic.NotificationsActivity +.. com.example.frolic.NotificationsActivity$NotificationsAdapter
+com.example.frolic.Adapter <|-- com.example.frolic.NotificationsActivity$NotificationsAdapter
+com.example.frolic.NotificationsActivity$NotificationsAdapter +.. com.example.frolic.NotificationsActivity$NotificationsAdapter$NotificationViewHolder
+com.example.frolic.ViewHolder <|-- com.example.frolic.NotificationsActivity$NotificationsAdapter$NotificationViewHolder
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.OrganizerDashboardActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.ChosenEntrantsActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.DisplayEventQrCodeActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.EntrantDetailsActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.ListEventActivity
+com.example.frolic.ListEventActivity +.. com.example.frolic.ListEventActivity$DateSetListener
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.AdminEventsActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.WaitingListActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.RoleSelectionActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.EventsListActivity
+com.example.frolic.EventsListActivity +.. com.example.frolic.EventsListActivity$EventsAdapter
+com.example.frolic.Adapter <|-- com.example.frolic.EventsListActivity$EventsAdapter
+com.example.frolic.EventsListActivity$EventsAdapter +.. com.example.frolic.EventsListActivity$EventsAdapter$EventsViewHolder
+com.example.frolic.ViewHolder <|-- com.example.frolic.EventsListActivity$EventsAdapter$EventsViewHolder
+com.example.frolic.Adapter <|-- com.example.frolic.ManageEventsAdapter
+com.example.frolic.ManageEventsAdapter +.. com.example.frolic.ManageEventsAdapter$EventViewHolder
+com.example.frolic.ViewHolder <|-- com.example.frolic.ManageEventsAdapter$EventViewHolder
+androidx.appcompat.app.AppCompatActivity <|-- com.example.frolic.EntrantEditProfile
+android.app.Activity <|-- com.example.frolic.EntrantProfileActivity
+@enduml
