@@ -17,6 +17,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
     private static final String TAG = "AdminDashboardActivity";
     private FirebaseFirestore db;
     private String deviceId;
+    private Button btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +46,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
         TextView manageProfiles = findViewById(R.id.tvManageProfiles);
         TextView manageFacilities = findViewById(R.id.tvManageFacilities);
         btnBack = findViewById(R.id.tvBack);
-        // Removing back button functionality as requested
-
 
         btnBack.setOnClickListener(v -> {
             Intent intent = new Intent(this, RoleSelectionActivity.class);
@@ -74,15 +73,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Prevents going back from the admin dashboard
-     */
-    @Override
-    public void onBackPressed() {
-        Toast.makeText(this,
-                "Please use the menu options to navigate",
-                Toast.LENGTH_SHORT).show();
-    }
+
 
     /**
      * Verifies that the current user has admin privileges by checking the admin flag
