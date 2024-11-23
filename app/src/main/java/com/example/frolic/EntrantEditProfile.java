@@ -129,6 +129,13 @@ public class EntrantEditProfile extends AppCompatActivity {
                                 cbNotifications.setChecked(notifications);
                             }
 
+                            Boolean isAdmin = document.getBoolean("admin");
+                            if (isAdmin != null && isAdmin) {
+                                tvAdminStatus.setText("Admin Status: Yes");
+                            } else {
+                                tvAdminStatus.setText("Admin Status: Regular User");
+                            }
+
                             String base64Image = document.getString("profileImage");
                             if (base64Image != null) {
                                 byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
@@ -228,13 +235,15 @@ public class EntrantEditProfile extends AppCompatActivity {
             }
         }
 
+        boolean isAdmin = getIntent().getBooleanExtra("isAdmin", false);
+
         Map<String, Object> userData = new HashMap<>();
         userData.put("deviceId", deviceId);
         userData.put("name", name);
         userData.put("email", email);
         userData.put("phoneNumber", phoneStr.isEmpty() ? 0 : Integer.parseInt(phoneStr));
         userData.put("notifications", cbNotifications.isChecked());
-        userData.put("admin", false);
+        userData.put("admin", isAdmin);
 
         if (selectedImageUri != null) {
             handleImageInFirestore(userData);
