@@ -73,15 +73,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Prevents going back from the admin dashboard
-     */
-    @Override
-    public void onBackPressed() {
-        Toast.makeText(this,
-                "Please use the menu options to navigate",
-                Toast.LENGTH_SHORT).show();
-    }
+
 
     /**
      * Verifies that the current user has admin privileges by checking the admin flag
