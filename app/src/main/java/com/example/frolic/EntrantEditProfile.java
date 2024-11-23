@@ -129,6 +129,13 @@ public class EntrantEditProfile extends AppCompatActivity {
                                 cbNotifications.setChecked(notifications);
                             }
 
+                            Boolean isAdmin = document.getBoolean("admin");
+                            if (isAdmin != null && isAdmin) {
+                                tvAdminStatus.setText("Admin Status: Yes");
+                            } else {
+                                tvAdminStatus.setText("Admin Status: Regular User");
+                            }
+
                             String base64Image = document.getString("profileImage");
                             if (base64Image != null) {
                                 byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
@@ -215,7 +222,20 @@ public class EntrantEditProfile extends AppCompatActivity {
         if (email.isEmpty()) {
             etEmail.setError("Email is required");
             return;
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            etEmail.setError("Invalid email format");
+            return;
         }
+
+        // Validate Phone Number (only if provided)
+        if (!phoneStr.isEmpty()) {
+            if (!phoneStr.matches("\\d{9,}")) { // Ensures at least 9 digits
+                etPhone.setError("Phone number must be at least 9 digits");
+                return;
+            }
+        }
+
+        boolean isAdmin = getIntent().getBooleanExtra("isAdmin", false);
 
         Map<String, Object> userData = new HashMap<>();
         userData.put("deviceId", deviceId);
@@ -223,7 +243,7 @@ public class EntrantEditProfile extends AppCompatActivity {
         userData.put("email", email);
         userData.put("phoneNumber", phoneStr.isEmpty() ? 0 : Integer.parseInt(phoneStr));
         userData.put("notifications", cbNotifications.isChecked());
-        userData.put("admin", false);
+        userData.put("admin", isAdmin);
 
         if (selectedImageUri != null) {
             handleImageInFirestore(userData);
