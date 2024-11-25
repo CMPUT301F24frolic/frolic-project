@@ -3,12 +3,22 @@ package com.example.frolic;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+
 import androidx.appcompat.app.AppCompatActivity;
-import com.google.firebase.firestore.FirebaseFirestore;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
+
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Entry point of the application.
@@ -31,6 +41,32 @@ public class MainActivity extends AppCompatActivity {
 
         setupProgressDialog();
         checkExistingUser();
+
+        // Fetch the FCM token asynchronously
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w(TAG, "Fetching FCM token failed", task.getException());
+                        return;
+                    }
+
+                    // Get the FCM registration token
+                    String token = task.getResult();
+                    Log.d("FCM_TOKEN", "Entrant FCM Token: " + token);
+
+                    // Save the token to Firestore after fetching
+                    String entrantId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Get the logged-in user ID
+                    saveTokenToFirestore(entrantId, token);
+
+                    // Request notification permissions for Android 13+ (API 33+)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+                                != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(this,
+                                    new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1);
+                        }
+                    }
+                });
     }
 
     /**
@@ -92,6 +128,23 @@ public class MainActivity extends AppCompatActivity {
     */
     }
 
+    /**
+     * Saves the FCM token to Firestore under the user's document.
+     * @param userId The user's ID
+     * @param token The FCM token
+     */
+    public void saveTokenToFirestore(String userId, String token) {
+        db.collection("entrants")  // Assuming the user is an entrant, you can change this as needed
+                .document(userId)
+                .update("fcm_token", token) // Store the FCM token in the Firestore document
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "FCM token updated successfully for user: " + userId);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error updating FCM token for user: " + userId, e);
+                });
+    }
+
     private void handleError(Exception e) {
         progressDialog.dismiss();
         Log.e(TAG, "Error checking user", e);
@@ -112,6 +165,20 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == 1) { // The request code we used in the permission request
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted
+                Log.d("NotificationPermission", "POST_NOTIFICATIONS permission granted");
+            } else {
+                // Permission denied
+                Log.d("NotificationPermission", "POST_NOTIFICATIONS permission denied");
+            }
+        }
+    }
     /**
      * Navigates to appropriate dashboard based on user's role.
      * Handles different role types and invalid roles.
@@ -151,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
     }
+
 
     @Override
     protected void onDestroy() {

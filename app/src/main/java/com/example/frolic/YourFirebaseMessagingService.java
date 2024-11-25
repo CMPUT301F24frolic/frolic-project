@@ -1,13 +1,11 @@
 package com.example.frolic;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -19,41 +17,39 @@ public class YourFirebaseMessagingService extends FirebaseMessagingService {
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
 
-        // Log or store the token to send notifications
-        Log.d(TAG, "FCM Token: " + token);
-
-        // Optionally send the token to your server to store it and use for notifications
-        // sendTokenToServer(token);
+        // Log the token to Logcat
+        Log.d("FCM_TOKEN", "New FCM Registration Token: " + token);
+//        sendTokenToServer(token);
     }
+//
+//    // Optional: Send the token to your server for notification purposes
+//    private void sendTokenToServer(String token) {
+//        // Replace this with actual code to send the token to your backend server.
+//        Log.d("FCM_TOKEN", "Sending token to server: " + token);
+//    }
 
-    // Optional: Send the token to your server for notification purposes
-    private void sendTokenToServer(String token) {
-        // Your code to send token to your backend server
-    }
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        // Handle FCM messages here.
+        Log.d("FCM_DEBUG", "Message received from: " + remoteMessage.getFrom());
         if (remoteMessage.getNotification() != null) {
+            Log.d("FCM_DEBUG", "Message Notification Title: " + remoteMessage.getNotification().getTitle());
+            Log.d("FCM_DEBUG", "Message Notification Body: " + remoteMessage.getNotification().getBody());
             showNotification(remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody());
         }
     }
 
+
     private void showNotification(String title, String message) {
-        String channelId = "default_channel_id";
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(channelId, "Default Channel", NotificationManager.IMPORTANCE_DEFAULT);
-            notificationManager.createNotificationChannel(channel);
-        }
-
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, channelId)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "default_channel_id")
+                .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(title)
                 .setContentText(message)
-                .setSmallIcon(R.drawable.ic_notification)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true);
 
-        notificationManager.notify(1, notificationBuilder.build());
+        NotificationManagerCompat manager = NotificationManagerCompat.from(this);
+        manager.notify(1001, builder.build());
     }
+
 }

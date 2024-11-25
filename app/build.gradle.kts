@@ -42,7 +42,7 @@ dependencies {
     // Firebase Authentication
     implementation("com.google.firebase:firebase-auth")
     // Firebase Cloud Messaging (FCM) for push notifications
-    implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-messaging:23.1.2")
     // Firebase Storage for storing event posters
     implementation("com.google.firebase:firebase-storage")
     // Firebase Analytics

@@ -124,11 +124,12 @@ public class AdminProfilesActivity extends AppCompatActivity {
                             String role = userType.endsWith("s") ?
                                     userType.substring(0, userType.length() - 1).toUpperCase() :
                                     userType.toUpperCase();
+                            String FCM_token = document.getString("FCM_token");
 
                             int phoneNumber = document.getLong("phoneNumber") != null ?
                                     document.getLong("phoneNumber").intValue() : 0;
 
-                            Identity profile = new Identity(deviceId, name, email, role, phoneNumber);
+                            Identity profile = new Identity(deviceId, name, email, role, phoneNumber, FCM_token);
 
                             if (document.contains("admin")) {
                                 profile.setAdmin(document.getBoolean("admin"));

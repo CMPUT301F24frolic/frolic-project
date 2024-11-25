@@ -15,6 +15,7 @@ public class Identity {
     private int phoneNumber;
     private boolean admin = false;
     private boolean notifications = false;
+    private String FCM_token;
 
     /**
      * This constructor takes in a device ID parameter and sets a default Identity.
@@ -22,7 +23,7 @@ public class Identity {
      * @param deviceID
      * This parameter is a device ID that is defined by the device and specifies which user is accessing the app.
      */
-    public Identity(String deviceID) {
+    public Identity(String deviceID, String FCM_token) {
         this.deviceID = deviceID;
         name = "";
         email = "";
@@ -37,11 +38,12 @@ public class Identity {
      * @param email The string that will represent the identity's email address.
      * @param role The string that will represent the user's role ("ENTRANT", "ORGANIZER").
      */
-    public Identity(String deviceID, String name, String email, String role) {
+    public Identity(String deviceID, String name, String email, String role, String FCM_token) {
         this.deviceID = deviceID;
         this.name = name;
         this.email = email;
         this.role = role;
+        this.FCM_token = FCM_token;
         phoneNumber = 0;
     }
 
@@ -52,12 +54,14 @@ public class Identity {
      * @param email The string that will represent the identity's email address.
      * @param role The string that will represent the user's role ("ENTRANT", "ORGANIZER").
      * @param phoneNumber The integer value that will represent the identity's phone number.
+     * @param FCM_token
      */
-    public Identity(String deviceID, String name, String email, String role, int phoneNumber) {
+    public Identity(String deviceID, String name, String email, String role, int phoneNumber, String FCM_token) {
         this.deviceID = deviceID;
         this.name = name;
         this.email = email;
         this.role = role;
+        this.FCM_token = FCM_token;
         this.phoneNumber = phoneNumber;
     }
 
@@ -174,4 +178,21 @@ public class Identity {
     public void setDeviceID(String deviceID) {
         this.deviceID = deviceID;
     }
+
+    /**
+     * Gets the FCM token associated with this identity.
+     * @return The string representing the identity's FCM token.
+     */
+
+    public String getFCM_token(){return FCM_token;}
+
+    /**
+     * Gets the FCM token associated with this identity.
+     * @param FCM_token The string to set as the identity's FCM_token.
+     */
+
+    public void setFCM_token(String FCM_token){
+        this.FCM_token = FCM_token;
+    }
 }
+
