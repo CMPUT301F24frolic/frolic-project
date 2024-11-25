@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.ByteArrayOutputStream;
@@ -75,8 +76,7 @@ public class EntrantEditProfile extends AppCompatActivity {
 
         initializeViews();
         setupClickListeners(fromRoleSelection);
-        fetchFcmToken();
-        loadExistingData();
+        fetchFcmTokenAndLoadData();
     }
 
     private void initializeViews() {
@@ -113,13 +113,30 @@ public class EntrantEditProfile extends AppCompatActivity {
         });
     }
 
-    private void fetchFcmToken() {
+    private void fetchFcmTokenAndLoadData() {
         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 FCM_token = task.getResult();
                 Log.d(TAG, "FCM Token: " + FCM_token);
+
+                if (deviceId != null) {
+                    db.collection("entrants")
+                            .document(deviceId)
+                            .update("FCM_token", FCM_token)
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d(TAG, "FCM token saved successfully");
+                                loadExistingData(); // Load data after saving token
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Failed to save FCM token", e);
+                                loadExistingData();
+                            });
+                } else {
+                    loadExistingData();
+                }
             } else {
                 Log.e(TAG, "Failed to fetch FCM token", task.getException());
+                loadExistingData();
             }
         });
     }
@@ -161,7 +178,7 @@ public class EntrantEditProfile extends AppCompatActivity {
                             }
 
                             // Load FCM token if present
-                            FCM_token = document.getString("fcmToken");
+                            FCM_token = document.getString("FCM_token");
                             Log.d(TAG, "Loaded FCM Token: " + FCM_token);
                         } else if (getIntent().getBooleanExtra("isNewRole", false)) {
                             // New role, try to copy data from organizer profile
@@ -262,8 +279,6 @@ public class EntrantEditProfile extends AppCompatActivity {
         userData.put("phoneNumber", phoneStr.isEmpty() ? 0 : Integer.parseInt(phoneStr));
         userData.put("notifications", cbNotifications.isChecked());
         userData.put("admin", isAdmin);
-        userData.put("FCM_token", FCM_token); // Add FCM token
-
 
         if (selectedImageUri != null) {
             handleImageInFirestore(userData);
@@ -310,7 +325,7 @@ public class EntrantEditProfile extends AppCompatActivity {
     private void saveProfileData(Map<String, Object> userData) {
         db.collection("entrants")
                 .document(deviceId)
-                .set(userData)
+                .set(userData, SetOptions.merge())
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Profile saved successfully", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(this, EntrantDashboardActivity.class);
