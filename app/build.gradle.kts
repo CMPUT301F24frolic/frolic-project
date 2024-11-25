@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
+    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
 }
 
 android {
@@ -30,6 +31,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    buildFeatures {
+        viewBinding = true
+    }
 
     tasks.withType<Test>{
         useJUnitPlatform()
@@ -58,6 +62,8 @@ dependencies {
     implementation("com.google.android.material:material:1.8.0")
     implementation("androidx.activity:activity:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation ("com.google.android.gms:play-services-maps:18.1.0")
+    implementation ("com.google.android.gms:play-services-location:21.0.1")
     implementation(libs.androidx.junit)
 
     // Testing libraries

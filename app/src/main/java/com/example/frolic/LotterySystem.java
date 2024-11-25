@@ -16,6 +16,9 @@ public class LotterySystem {
     private int maxAttendees;
     private int maxWaiting;
 
+    // Map for storing entrant locations (entrantId -> {latitude, longitude})
+    private Map<String, Map<String, Double>> locations = new HashMap<>();
+
     // TODO: Add Javadocs
 
     /**
@@ -137,7 +140,32 @@ public class LotterySystem {
         lotteryMap.put("canceledListIds", canceledListIds);
         lotteryMap.put("maxAttendees", maxAttendees);
         lotteryMap.put("maxWaiting", maxWaiting);
+        lotteryMap.put("locations", locations);
         return lotteryMap;
+    }
+
+    /**
+     * Adds a location for an entrant.
+     *
+     * @param entrantId the ID of the entrant
+     * @param latitude  the latitude of the entrant's location
+     * @param longitude the longitude of the entrant's location
+     */
+    public void addLocation(String entrantId, double latitude, double longitude) {
+        Map<String, Double> latLongMap = new HashMap<>();
+        latLongMap.put("latitude", latitude);
+        latLongMap.put("longitude", longitude);
+        locations.put(entrantId, latLongMap);
+    }
+
+    /**
+     * Retrieves the location of an entrant.
+     *
+     * @param entrantId the ID of the entrant
+     * @return a map containing latitude and longitude, or null if not found
+     */
+    public Map<String, Double> getLocation(String entrantId) {
+        return locations.get(entrantId);
     }
 
     public ArrayList<String> getWaitingListIds() {
@@ -179,4 +207,8 @@ public class LotterySystem {
     public void setMaxWaiting(int maxWaiting) {
         this.maxWaiting = maxWaiting;
     }
+
+    public Map<String, Map<String, Double>> getLocations() { return locations; }
+
+    public void setLocations(Map<String, Map<String, Double>> locations) { this.locations = locations; }
 }
