@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -136,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
     public void saveTokenToFirestore(String userId, String token) {
         db.collection("entrants")  // Assuming the user is an entrant, you can change this as needed
                 .document(userId)
-                .update("fcm_token", token) // Store the FCM token in the Firestore document
+                .set(token, SetOptions.merge()) // Store the FCM token in the Firestore document
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "FCM token updated successfully for user: " + userId);
                 })

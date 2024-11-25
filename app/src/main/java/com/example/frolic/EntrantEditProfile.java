@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -43,6 +44,7 @@ public class EntrantEditProfile extends AppCompatActivity {
     private FirebaseFirestore db;
     private String deviceId;
     private Uri selectedImageUri;
+    private String FCM_token;
 
     private ImageView ivProfileImage;
     private EditText etName, etEmail, etPhone;
@@ -73,6 +75,7 @@ public class EntrantEditProfile extends AppCompatActivity {
 
         initializeViews();
         setupClickListeners(fromRoleSelection);
+        fetchFcmToken();
         loadExistingData();
     }
 
@@ -107,6 +110,17 @@ public class EntrantEditProfile extends AppCompatActivity {
                 startActivity(intent);
             }
             finish();
+        });
+    }
+
+    private void fetchFcmToken() {
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                FCM_token = task.getResult();
+                Log.d(TAG, "FCM Token: " + FCM_token);
+            } else {
+                Log.e(TAG, "Failed to fetch FCM token", task.getException());
+            }
         });
     }
 
@@ -145,6 +159,10 @@ public class EntrantEditProfile extends AppCompatActivity {
                                         .circleCrop()
                                         .into(ivProfileImage);
                             }
+
+                            // Load FCM token if present
+                            FCM_token = document.getString("fcmToken");
+                            Log.d(TAG, "Loaded FCM Token: " + FCM_token);
                         } else if (getIntent().getBooleanExtra("isNewRole", false)) {
                             // New role, try to copy data from organizer profile
                             copyFromOrganizerProfile();
@@ -244,6 +262,8 @@ public class EntrantEditProfile extends AppCompatActivity {
         userData.put("phoneNumber", phoneStr.isEmpty() ? 0 : Integer.parseInt(phoneStr));
         userData.put("notifications", cbNotifications.isChecked());
         userData.put("admin", isAdmin);
+        userData.put("FCM_token", FCM_token); // Add FCM token
+
 
         if (selectedImageUri != null) {
             handleImageInFirestore(userData);
