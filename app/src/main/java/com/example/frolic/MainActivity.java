@@ -13,13 +13,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Collections;
 
 /**
  * Entry point of the application.
@@ -42,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
         setupProgressDialog();
         checkExistingUser();
+        FirebaseApp.initializeApp(this);
 
         // Fetch the FCM token asynchronously
         FirebaseMessaging.getInstance().getToken()
@@ -55,9 +60,14 @@ public class MainActivity extends AppCompatActivity {
                     String token = task.getResult();
                     Log.d("FCM_TOKEN", "Entrant FCM Token: " + token);
 
-                    // Save the token to Firestore after fetching
-                    String entrantId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Get the logged-in user ID
-                    saveTokenToFirestore(entrantId, token);
+                    // Check if user is authenticated before saving the token
+                    FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                    if (currentUser != null) {
+                        saveTokenToFirestore(currentUser.getUid(), token);
+                    } else {
+                        Log.e(TAG, "User is not authenticated!");
+                        // Handle unauthenticated state (e.g., redirect to login)
+                    }
 
                     // Request notification permissions for Android 13+ (API 33+)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -135,15 +145,16 @@ public class MainActivity extends AppCompatActivity {
      * @param token The FCM token
      */
     public void saveTokenToFirestore(String userId, String token) {
-        db.collection("entrants")  // Assuming the user is an entrant, you can change this as needed
+        if (userId == null || token == null) {
+            Log.e(TAG, "Invalid userId or token!");
+            return;
+        }
+
+        db.collection("entrants")  // Assuming the user is an entrant, adjust this as needed
                 .document(userId)
-                .set(token, SetOptions.merge()) // Store the FCM token in the Firestore document
-                .addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "FCM token updated successfully for user: " + userId);
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error updating FCM token for user: " + userId, e);
-                });
+                .set(Collections.singletonMap("fcmToken", token), SetOptions.merge())
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "FCM token updated successfully for user: " + userId))
+                .addOnFailureListener(e -> Log.e(TAG, "Error updating FCM token for user: " + userId, e));
     }
 
     private void handleError(Exception e) {
