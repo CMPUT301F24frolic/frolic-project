@@ -3,25 +3,16 @@ package com.example.frolic;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
-import com.google.firebase.messaging.FirebaseMessaging;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collections;
 
@@ -48,36 +39,7 @@ public class MainActivity extends AppCompatActivity {
         checkExistingUser();
         FirebaseApp.initializeApp(this);
 
-        // Fetch the FCM token asynchronously
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()) {
-                        Log.w(TAG, "Fetching FCM token failed", task.getException());
-                        return;
-                    }
-
-                    // Get the FCM registration token
-                    String token = task.getResult();
-                    Log.d("FCM_TOKEN", "Entrant FCM Token: " + token);
-
-                    // Check if user is authenticated before saving the token
-                    FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-                    if (currentUser != null) {
-                        saveTokenToFirestore(currentUser.getUid(), token);
-                    } else {
-                        Log.e(TAG, "User is not authenticated!");
-                        // Handle unauthenticated state (e.g., redirect to login)
-                    }
-
-                    // Request notification permissions for Android 13+ (API 33+)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
-                                != PackageManager.PERMISSION_GRANTED) {
-                            ActivityCompat.requestPermissions(this,
-                                    new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1);
-                        }
-                    }
-                });
+        
     }
 
     /**
@@ -177,20 +139,6 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == 1) { // The request code we used in the permission request
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted
-                Log.d("NotificationPermission", "POST_NOTIFICATIONS permission granted");
-            } else {
-                // Permission denied
-                Log.d("NotificationPermission", "POST_NOTIFICATIONS permission denied");
-            }
-        }
-    }
     /**
      * Navigates to appropriate dashboard based on user's role.
      * Handles different role types and invalid roles.
