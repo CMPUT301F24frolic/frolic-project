@@ -1,8 +1,12 @@
 package com.example.frolic;
 
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -35,11 +39,34 @@ public class MainActivity extends AppCompatActivity {
         deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         Log.d(TAG, "Device ID: " + deviceId);
 
+        // Create notification channel
+        createNotificationChannel(this);
+
         setupProgressDialog();
         checkExistingUser();
         FirebaseApp.initializeApp(this);
+    }
 
-        
+    /**
+     * Creates a notification channel required for Android 8.0 (API level 26) and above.
+     * @param context The context to access system services
+     */
+    private void createNotificationChannel(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Create the NotificationChannel
+            CharSequence name = "Default Channel";
+            String description = "This is the default notification channel.";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+
+            NotificationChannel channel = new NotificationChannel("default_channel_id", name, importance);
+            channel.setDescription(description);
+
+            // Register the channel with the system
+            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
     }
 
     /**
@@ -65,40 +92,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
 
-    /* Original code commented out for reference
-    db.collection("entrants").document(deviceId).get()
-            .addOnSuccessListener(entrantDoc -> {
-                db.collection("organizers").document(deviceId).get()
-                        .addOnSuccessListener(organizerDoc -> {
-                            db.collection("admins").document(deviceId).get()
-                                    .addOnSuccessListener(adminDoc -> {
-                                        progressDialog.dismiss();
-                                        if (adminDoc.exists()) {
-                                            startActivity(new Intent(this, AdminDashboardActivity.class)
-                                                    .putExtra("deviceId", deviceId));
-                                            finish();
-                                        } else if (organizerDoc.exists()) {
-                                            startActivity(new Intent(this, OrganizerDashboardActivity.class)
-                                                    .putExtra("deviceId", deviceId));
-                                            finish();
-                                        } else if (entrantDoc.exists()) {
-                                            startActivity(new Intent(this, EntrantDashboardActivity.class)
-                                                    .putExtra("deviceId", deviceId));
-                                            finish();
-                                        } else {
-                                            startActivity(new Intent(this, RoleSelectionActivity.class)
-                                                    .putExtra("deviceId", deviceId));
-                                            finish();
-                                        }
-                                    });
-                        });
-            })
-            .addOnFailureListener(e -> {
-                progressDialog.dismiss();
-                Log.e(TAG, "Error checking user", e);
-                showErrorDialog();
-            });
-    */
+        // Uncomment the original code if needed for actual database check
     }
 
     /**
@@ -124,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
         Log.e(TAG, "Error checking user", e);
         showErrorDialog();
     }
-
 
     /**
      * Shows error dialog with retry option when database access fails.
@@ -172,13 +165,11 @@ public class MainActivity extends AppCompatActivity {
             finish();
         } else {
             Log.e(TAG, "No role found in document");
-            // Remove the duplicate Intent declaration
             startActivity(new Intent(this, RoleSelectionActivity.class)
                     .putExtra("deviceId", deviceId));
             finish();
         }
     }
-
 
     @Override
     protected void onDestroy() {

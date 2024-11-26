@@ -47,6 +47,9 @@ dependencies {
     implementation("com.google.firebase:firebase-storage")
     // Firebase Analytics
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation("org.json:json:20210307")
+    implementation("com.auth0:java-jwt:3.18.1")
     implementation ("com.google.zxing:core:3.4.1")
     implementation ("com.journeyapps:zxing-android-embedded:4.3.0")
     implementation(libs.appcompat)

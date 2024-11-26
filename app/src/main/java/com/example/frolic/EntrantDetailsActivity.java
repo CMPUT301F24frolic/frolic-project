@@ -62,7 +62,6 @@ public class EntrantDetailsActivity extends AppCompatActivity {
         rvEntrants = findViewById(R.id.rvEntrants);
 
         btnPickEntrants = findViewById(R.id.btnPickEntrants);
-        btnNotifyAllEntrants = findViewById(R.id.btnNotifyAllEntrants);
 
         rvEntrants.setLayoutManager(new LinearLayoutManager(this));
         adapter = new EntrantsAdapter(confirmedEntrantIds); // Pass the list of entrant IDs
@@ -107,10 +106,7 @@ public class EntrantDetailsActivity extends AppCompatActivity {
                         ArrayList<String> inviteds = lottery.getInvitedListIds();
                         ArrayList<String> waitings = lottery.getWaitingListIds();
 
-                        for (int i = 0; i < inviteds.size(); i++) {
-                            Log.d("", "" + inviteds.get(i));
-                        }
-
+                        // Update Firestore with new entrant lists
                         Map<String, Object> updates = new HashMap<>();
                         updates.put("invitedListIds", inviteds);
                         updates.put("waitingListIds", waitings);
@@ -120,16 +116,59 @@ public class EntrantDetailsActivity extends AppCompatActivity {
                                 .addOnSuccessListener(aVoid -> {
                                     Log.d("PickEntrants", "invitedListIds updated successfully");
                                     loadEntrantDetails();
+
+                                    FCMHelper fcm = new FCMHelper();
+
+                                    for (int i = 0; i < inviteds.size(); i++) {
+                                        String invitedId = inviteds.get(i);
+                                        db.collection("entrants").document(invitedId).get()
+                                                .addOnSuccessListener(entrantDocument -> {
+                                                    if (entrantDocument.exists()) {
+                                                        // Retrieve the FCM token directly from the document
+                                                        String fcmToken = entrantDocument.getString("FCM_token");
+                                                        if (fcmToken != null) {
+                                                            // Send the notification using the FCM token
+                                                            fcm.sendNotificationToFCMToken(this, fcmToken, "You've been accepted!", "You've been accepted for the lottery for event " + eventId);
+                                                        } else {
+                                                            Log.e("PickEntrants", "FCM token is null for entrant: " + invitedId);
+                                                        }
+                                                    } else {
+                                                        Log.e("PickEntrants", "Entrant document does not exist: " + invitedId);
+                                                    }
+                                                })
+                                                .addOnFailureListener(e -> Log.e("PickEntrants", "Error fetching entrant document", e));
+                                    }
+
+                                    for (int i = 0; i < waitings.size(); i++) {
+                                        String waitingId = waitings.get(i);
+                                        db.collection("entrants").document(waitingId).get()
+                                                .addOnSuccessListener(entrantDocument -> {
+                                                    if (entrantDocument.exists()) {
+                                                        // Retrieve the FCM token directly from the document
+                                                        String fcmToken = entrantDocument.getString("FCM_token");
+                                                        if (fcmToken != null) {
+                                                            // Send the notification using the FCM token
+                                                            fcm.sendNotificationToFCMToken(this, fcmToken, "You're still on the wait list.", "The first lottery for event " + eventId + " has passed and you weren't selected. But you can still wait for another round!");
+                                                        } else {
+                                                            Log.e("PickEntrants", "FCM token is null for entrant: " + waitingId);
+                                                        }
+                                                    } else {
+                                                        Log.e("PickEntrants", "Entrant document does not exist: " + waitingId);
+                                                    }
+                                                })
+                                                .addOnFailureListener(e -> Log.e("PickEntrants", "Error fetching entrant document", e));
+                                    }
+
+
                                 })
                                 .addOnFailureListener(e -> Log.e("PickEntrants", "Error updating invitedListIds", e));
-
-                        Log.d("PickEntrants", "Max attendees: " + lottery.getMaxAttendees());
                     } else {
                         Log.d("EventRead", "No such event found");
                     }
                 })
                 .addOnFailureListener(e -> Log.e("EventRead", "Error fetching event", e));
     }
+
 
 
 
