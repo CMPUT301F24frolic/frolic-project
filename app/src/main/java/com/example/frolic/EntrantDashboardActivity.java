@@ -8,7 +8,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
@@ -123,13 +126,65 @@ public class EntrantDashboardActivity extends AppCompatActivity {
      * Shows dialog to confirm role switch
      */
     private void showRoleSwitchDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Switch Role")
-                .setMessage("Switch to Organizer role?")
-                .setPositiveButton("Switch", (dialog, which) -> switchToOrganizerRole())
-                .setNegativeButton("Cancel", null)
-                .show();
+        String deviceId = getIntent().getStringExtra("deviceId");
+
+        if (deviceId == null) {
+            Log.e(TAG, "Device ID is missing");
+            Toast.makeText(this, "Error: Device ID not found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        db.collection("entrants").document(deviceId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        boolean isAdmin = Boolean.TRUE.equals(documentSnapshot.getBoolean("admin"));
+
+                        // Create dialog with dynamic role options
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setTitle("Switch Role");
+
+                        String[] roles = isAdmin
+                                ? new String[]{"Organizer", "Admin"}  // Include Admin if the user is an admin
+                                : new String[]{"Organizer"};         // Only Organizer if not an admin
+
+                        builder.setItems(roles, (dialog, which) -> {
+                            switch (which) {
+                                case 0: // Organizer
+                                    switchToOrganizerRole();
+                                    break;
+                                case 1: // Admin
+                                    switchToAdminRole();
+                                    break;
+                                default:
+                                    break;
+                            }
+                        });
+
+                        builder.setNegativeButton("Cancel", null);
+                        builder.show();
+                    } else {
+                        Log.e(TAG, "User document not found");
+                        Toast.makeText(this, "User not found. Unable to switch roles.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error fetching user data: " + e.getMessage());
+                    Toast.makeText(this, "Failed to retrieve user data.", Toast.LENGTH_SHORT).show();
+                });
     }
+
+    /**
+     * Switches the user to the Admin role and navigates to the Admin Dashboard.
+     */
+    private void switchToAdminRole() {
+        String deviceId = getIntent().getStringExtra("deviceId");
+
+        Intent intent = new Intent(this, AdminDashboardActivity.class);
+        intent.putExtra("deviceId", deviceId);
+        startActivity(intent);
+        finish();
+    }
+
 
     /**
      * Handles switching user to Organizer role
