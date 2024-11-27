@@ -22,7 +22,7 @@ public class RoleSelectionActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private Button btnEntrant, btnOrganizer, btnAdmin;
     private TextView tvTitle, tvDescription;
-
+    private boolean isAdmin;
     /**
      * Initializes the activity, sets up the Firebase instance, and configures
      * the role selection interface. Handles the initial visibility of admin features
@@ -96,6 +96,8 @@ public class RoleSelectionActivity extends AppCompatActivity {
                                 Log.d(TAG, "Entrant has completed profile. Redirecting to Dashboard.");
                                 Intent intent = new Intent(this, EntrantDashboardActivity.class);
                                 intent.putExtra("deviceId", deviceId);
+                                intent.putExtra("isAdmin", isAdmin);
+                                intent.putExtra("fromRoleSelection", true);
                                 startActivity(intent);
                             } else {
                                 // Redirect to Edit Profile if profile is incomplete
@@ -224,7 +226,7 @@ public class RoleSelectionActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        Boolean isAdmin = documentSnapshot.getBoolean("admin");
+                        isAdmin = documentSnapshot.getBoolean("admin");
                         if (Boolean.TRUE.equals(isAdmin)) {
                             Log.d(TAG, "Admin status verified for device: " + deviceId);
                             btnAdmin.setVisibility(View.VISIBLE);
