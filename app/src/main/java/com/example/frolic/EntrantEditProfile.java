@@ -199,18 +199,38 @@ public class EntrantEditProfile extends AppCompatActivity {
     }
 
     private void checkPermissionAndPickImage() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Requesting permission
-            Log.d(TAG, "Requesting READ_EXTERNAL_STORAGE permission.");
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    PERMISSION_REQUEST_CODE);
-        } else {
-            // Permission already granted; launch the image picker
-            Log.d(TAG, "Permission already granted. Launching image picker.");
-            launchImagePicker();
+        // For Android 13 and above (API 33+)
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_MEDIA_IMAGES},
+                        PERMISSION_REQUEST_CODE);
+            } else {
+                launchImagePicker();
+            }
+        }
+        // For Android 12 and below
+        else {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        PERMISSION_REQUEST_CODE);
+            } else {
+                launchImagePicker();
+            }
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                launchImagePicker();
+            } else {
+                Toast.makeText(this, "Permission denied - cannot select image", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -285,25 +305,38 @@ public class EntrantEditProfile extends AppCompatActivity {
     }
 
     private void handleImageInFirestore(Map<String, Object> userData) {
-        if (selectedImageUri != null) {
-            if (selectedImageUri.toString().startsWith("http")) {
-                // Handle URL image
-                fetchBitmapFromUrl(selectedImageUri.toString(), bitmap -> {
-                    if (bitmap != null) {
-                        saveBitmapToFirestore(userData, bitmap);
-                    } else {
-                        Toast.makeText(this, "Error fetching image from URL", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            } else {
-                // Handle device URI
-                try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
+        if (selectedImageUri == null) {
+            Log.e(TAG, "No image URI selected");
+            Toast.makeText(this, "No image selected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (selectedImageUri.toString().startsWith("http")) {
+            // Handle URL image
+            fetchBitmapFromUrl(selectedImageUri.toString(), bitmap -> {
+                if (bitmap != null) {
                     saveBitmapToFirestore(userData, bitmap);
-                } catch (IOException e) {
-                    Log.e(TAG, "Error processing image from device", e);
-                    Toast.makeText(this, "Error processing image", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Error fetching image from URL", Toast.LENGTH_SHORT).show();
+                    // Fall back to default profile picture
+                    userData.put("profileImage", generateDefaultProfilePicture(etName.getText().toString().trim()));
+                    saveProfileData(userData);
                 }
+            });
+        } else {
+            // Handle device URI
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
+                if (bitmap == null) {
+                    throw new IOException("Failed to create bitmap from URI");
+                }
+                saveBitmapToFirestore(userData, bitmap);
+            } catch (IOException | SecurityException e) {
+                Log.e(TAG, "Error processing image from device: " + e.getMessage());
+                Toast.makeText(this, "Error processing image", Toast.LENGTH_SHORT).show();
+                // Fall back to default profile picture
+                userData.put("profileImage", generateDefaultProfilePicture(etName.getText().toString().trim()));
+                saveProfileData(userData);
             }
         }
     }
@@ -324,14 +357,37 @@ public class EntrantEditProfile extends AppCompatActivity {
 
     // Helper method to save a Bitmap to Firestore
     private void saveBitmapToFirestore(Map<String, Object> userData, Bitmap bitmap) {
-        if (bitmap != null) {
-            Bitmap resized = getResizedBitmap(bitmap, 500); // Resize the bitmap
+        try {
+            if (bitmap == null) {
+                throw new IllegalArgumentException("Bitmap cannot be null");
+            }
+
+            // Resize bitmap for efficiency
+            Bitmap resized = getResizedBitmap(bitmap, 500);
+            if (resized == null) {
+                throw new IllegalStateException("Failed to resize bitmap");
+            }
+
+            // Convert to base64
             String base64Image = bitmapToBase64(resized);
-            userData.put("profileImage", base64Image); // Add to Firestore document
-            saveProfileData(userData); // Save profile data
-        } else {
-            Log.e(TAG, "Bitmap is null. Cannot save to Firestore.");
+            if (base64Image == null || base64Image.isEmpty()) {
+                throw new IllegalStateException("Failed to convert bitmap to base64");
+            }
+
+            // Add to Firestore document
+            userData.put("profileImage", base64Image);
+            saveProfileData(userData);
+
+            // Clean up
+            if (resized != bitmap) {
+                resized.recycle();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error in saveBitmapToFirestore: " + e.getMessage());
             Toast.makeText(this, "Error saving profile image", Toast.LENGTH_SHORT).show();
+            // Fall back to default profile picture
+            userData.put("profileImage", generateDefaultProfilePicture(etName.getText().toString().trim()));
+            saveProfileData(userData);
         }
     }
 
