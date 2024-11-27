@@ -81,24 +81,127 @@ public class RoleSelectionActivity extends AppCompatActivity {
         btnAdmin.setVisibility(View.GONE);
 
         // Set up Entrant button
+        // Set up Entrant button
         btnEntrant.setOnClickListener(v -> {
-            Intent intent = new Intent(this, EntrantEditProfile.class);
-            intent.putExtra("deviceId", deviceId);
-            intent.putExtra("role", "ENTRANT");
-            intent.putExtra("fromRoleSelection", true);
-            startActivity(intent);
-            finish();
+            db.collection("entrants")
+                    .document(deviceId)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            String name = documentSnapshot.getString("name");
+                            String email = documentSnapshot.getString("email");
+
+                            if (name != null && !name.isEmpty() && email != null && !email.isEmpty()) {
+                                // Redirect to Entrant Dashboard if name and email are set
+                                Log.d(TAG, "Entrant has completed profile. Redirecting to Dashboard.");
+                                Intent intent = new Intent(this, EntrantDashboardActivity.class);
+                                intent.putExtra("deviceId", deviceId);
+                                startActivity(intent);
+                            } else {
+                                // Redirect to Edit Profile if profile is incomplete
+                                Log.d(TAG, "Entrant profile incomplete. Redirecting to Edit Profile.");
+                                Intent intent = new Intent(this, EntrantEditProfile.class);
+                                intent.putExtra("deviceId", deviceId);
+                                intent.putExtra("role", "ENTRANT");
+                                intent.putExtra("fromRoleSelection", true);
+                                startActivity(intent);
+                            }
+                        } else {
+                            // Document does not exist, redirect to Edit Profile
+                            Log.d(TAG, "Entrant document not found. Redirecting to Edit Profile.");
+                            Intent intent = new Intent(this, EntrantEditProfile.class);
+                            intent.putExtra("deviceId", deviceId);
+                            intent.putExtra("role", "ENTRANT");
+                            intent.putExtra("fromRoleSelection", true);
+                            startActivity(intent);
+                        }
+                        finish();
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Error fetching entrant details: " + e.getMessage());
+                        Toast.makeText(this, "Error checking profile details", Toast.LENGTH_SHORT).show();
+                    });
         });
 
-        // Set up Organizer button
         btnOrganizer.setOnClickListener(v -> {
-            Intent intent = new Intent(this, OrganizerEditProfile.class);
-            intent.putExtra("deviceId", deviceId);
-            intent.putExtra("role", "ORGANIZER");
-            intent.putExtra("fromRoleSelection", true);
-            startActivity(intent);
-            finish();
+            db.collection("organizers")
+                    .document(deviceId)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            Log.d(TAG, "Document snapshot exists for deviceId: " + deviceId);
+                            //get name, email and facilityID
+                            String name = documentSnapshot.getString("name");
+                            String email = documentSnapshot.getString("email");
+                            String facilityId = documentSnapshot.getString("facilityId");
+
+                            if (name != null && !name.isEmpty() &&
+                                    email != null && !email.isEmpty() &&
+                                    facilityId != null && !facilityId.isEmpty()) {
+                                // Check the facility document for name
+                                db.collection("facilities")
+                                        .document(facilityId)
+                                        .get()
+                                        .addOnSuccessListener(facilitySnapshot -> {
+                                            if (facilitySnapshot.exists()) {
+                                                String facilityName = facilitySnapshot.getString("name");
+                                                //Name exists then redirect to organizer dashboard
+
+                                                if (facilityName != null && !facilityName.isEmpty()) {
+                                                    Log.d(TAG, "Facility name exists. Redirecting to Dashboard.");
+                                                    Intent intent = new Intent(this, OrganizerDashboardActivity.class);
+                                                    intent.putExtra("deviceId", deviceId);
+                                                    startActivity(intent);
+                                                    finish(); // End the current activity
+                                                } else {
+                                                    //name does not exist then redirect to edit profile
+                                                    Log.d(TAG, "Facility name is missing. Redirecting to Edit Profile.");
+                                                    Intent intent = new Intent(this, OrganizerEditProfile.class);
+                                                    intent.putExtra("deviceId", deviceId);
+                                                    intent.putExtra("role", "ORGANIZER");
+                                                    intent.putExtra("fromRoleSelection", true);
+                                                    startActivity(intent);
+                                                    finish(); // End the current activity
+                                                }
+                                            } else {
+                                                Log.d(TAG, "Facility document not found for facilityId: " + facilityId);
+                                                Intent intent = new Intent(this, OrganizerEditProfile.class);
+                                                intent.putExtra("deviceId", deviceId);
+                                                intent.putExtra("role", "ORGANIZER");
+                                                intent.putExtra("fromRoleSelection", true);
+                                                startActivity(intent);
+                                                finish(); // End the current activity
+                                            }
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e(TAG, "Error fetching facility details: " + e.getMessage());
+                                            Toast.makeText(this, "Error checking facility details", Toast.LENGTH_SHORT).show();
+                                        });
+                            } else {
+                                Log.d(TAG, "Organizer profile incomplete. Redirecting to Edit Profile.");
+                                Intent intent = new Intent(this, OrganizerEditProfile.class);
+                                intent.putExtra("deviceId", deviceId);
+                                intent.putExtra("role", "ORGANIZER");
+                                intent.putExtra("fromRoleSelection", true);
+                                startActivity(intent);
+                                finish(); // End the current activity
+                            }
+                        } else {
+                            Log.d(TAG, "Organizer document not found for deviceId: " + deviceId);
+                            Intent intent = new Intent(this, OrganizerEditProfile.class);
+                            intent.putExtra("deviceId", deviceId);
+                            intent.putExtra("role", "ORGANIZER");
+                            intent.putExtra("fromRoleSelection", true);
+                            startActivity(intent);
+                            finish(); // End the current activity
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Error fetching organizer details: " + e.getMessage());
+                        Toast.makeText(this, "Error checking profile details", Toast.LENGTH_SHORT).show();
+                    });
         });
+
 
         // Set up Admin button
         btnAdmin.setOnClickListener(v -> {

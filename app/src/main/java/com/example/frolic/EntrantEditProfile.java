@@ -121,7 +121,13 @@ public class EntrantEditProfile extends AppCompatActivity {
 
                             Long phoneNumber = document.getLong("phoneNumber");
                             if (phoneNumber != null) {
-                                etPhone.setText(String.valueOf(phoneNumber));
+                                if (phoneNumber == 0) {
+                                    etPhone.setText("");
+                                    return;
+                                }
+                                else {
+                                    etPhone.setText(String.valueOf(phoneNumber));
+                                }
                             }
 
                             Boolean notifications = document.getBoolean("notifications");
