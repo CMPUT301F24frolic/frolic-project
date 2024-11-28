@@ -22,7 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class EntrantDashboardActivity extends AppCompatActivity {
     private static final String TAG = "EntrantDashboard";
     private FirebaseFirestore db;
-
+    private NotificationHelper notificationHelper;
     /**
      * Initializes the dashboard activity, setting up click listeners for
      * navigation options and displaying user information.
@@ -39,6 +39,10 @@ public class EntrantDashboardActivity extends AppCompatActivity {
 
         // Initialize views and set up click listeners
         setupNavigationOptions();
+
+        // Grab notifications
+        notificationHelper = new NotificationHelper();
+        notificationHelper.getNotifications(this, getIntent().getStringExtra("deviceId"));
 
         // Set up action bar title
         if (getSupportActionBar() != null) {
