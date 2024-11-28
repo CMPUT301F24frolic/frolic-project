@@ -97,10 +97,12 @@ public class EntrantEditProfile extends AppCompatActivity {
         btnSaveChanges.setOnClickListener(v -> validateAndSaveProfile());
         btnBack.setOnClickListener(v -> {
             if (fromRoleSelection) {
+                // Navigate back to RoleSelectionActivity
                 Intent intent = new Intent(this, RoleSelectionActivity.class);
                 intent.putExtra("deviceId", deviceId);
                 startActivity(intent);
             } else {
+                // Navigate back to EntrantDashboardActivity
                 Intent intent = new Intent(this, EntrantDashboardActivity.class);
                 intent.putExtra("deviceId", deviceId);
                 startActivity(intent);
@@ -117,6 +119,7 @@ public class EntrantEditProfile extends AppCompatActivity {
                         if (document.exists()) {
                             populateEntrantData(document.getData());
                         } else if (getIntent().getBooleanExtra("isNewRole", false)) {
+                            // New role, try to copy data from organizer profile
                             copyFromOrganizerProfile();
                         }
                     })
@@ -127,6 +130,9 @@ public class EntrantEditProfile extends AppCompatActivity {
         }
     }
 
+    /**
+     * Copies existing profile data from organizer profile when creating new entrant profile
+     */
     private void populateEntrantData(Map<String, Object> data) {
         if (data == null) return;
 
@@ -287,6 +293,15 @@ public class EntrantEditProfile extends AppCompatActivity {
             etEmail.setError("Invalid email format");
             return;
         }
+        // Validate Phone Number (only if provided)
+        if (!phoneStr.isEmpty()) {
+            if (!phoneStr.matches("\\d{9,}")) { // Ensures at least 9 digits
+                etPhone.setError("Phone number must be at least 9 digits");
+                return;
+            }
+        }
+
+        boolean isAdmin = getIntent().getBooleanExtra("isAdmin", false);
 
         Map<String, Object> userData = new HashMap<>();
         userData.put("deviceId", deviceId);
