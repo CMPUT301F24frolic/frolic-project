@@ -13,6 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.WriteBatch;
+
 /**
  * Adapter for displaying and managing facilities in the admin interface.
  * Provides functionality for viewing facility details and managing policy violations.
@@ -165,15 +168,41 @@ public class AdminFacilitiesAdapter extends RecyclerView.Adapter<AdminFacilities
     }
 
     private void removeFacility(FacilityData facilityData) {
-        db.collection("facilities").document(facilityData.id)
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    facilitiesData.remove(facilityData);
-                    notifyDataSetChanged();
-                    Toast.makeText(context, "Facility removed", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Starting removal of facility: " + facilityData.id);
+
+        db.collection("events")
+                .whereEqualTo("facilityId", facilityData.id)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    Log.d(TAG, "Found " + querySnapshot.size() + " events for facility");
+
+                    WriteBatch batch = db.batch();
+
+                    for (QueryDocumentSnapshot document : querySnapshot) {
+                        String eventId = document.getId();
+                        Log.d(TAG, "Adding event to batch delete: " + eventId);
+
+                        batch.delete(db.collection("events").document(eventId));
+                        batch.delete(db.collection("lotteries").document(eventId));
+                    }
+
+                    batch.delete(db.collection("facilities").document(facilityData.id));
+
+                    Log.d(TAG, "Executing batch delete");
+                    batch.commit()
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d(TAG, "Batch delete successful");
+                                facilitiesData.remove(facilityData);
+                                notifyDataSetChanged();
+                                Toast.makeText(context, "Facility and associated events removed", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Batch delete failed", e);
+                                Toast.makeText(context, "Failed to remove facility and events", Toast.LENGTH_SHORT).show();
+                            });
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error removing facility", e);
+                    Log.e(TAG, "Failed to query events for facility", e);
                     Toast.makeText(context, "Failed to remove facility", Toast.LENGTH_SHORT).show();
                 });
     }
