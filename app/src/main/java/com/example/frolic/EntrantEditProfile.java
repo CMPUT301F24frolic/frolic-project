@@ -49,6 +49,7 @@ public class EntrantEditProfile extends AppCompatActivity {
     private CheckBox cbNotifications;
     private TextView tvAdminStatus, tvDeviceId;
     private Button btnUploadImage, btnSaveChanges, btnBack;
+    Boolean isAdmin= false;
 
     private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -121,7 +122,12 @@ public class EntrantEditProfile extends AppCompatActivity {
 
                             Long phoneNumber = document.getLong("phoneNumber");
                             if (phoneNumber != null) {
-                                etPhone.setText(String.valueOf(phoneNumber));
+                                if (phoneNumber == 0) {
+                                    etPhone.setText("");
+                                } else {
+                                    etPhone.setText(String.valueOf(phoneNumber));
+
+                                }
                             }
 
                             Boolean notifications = document.getBoolean("notifications");
@@ -129,8 +135,11 @@ public class EntrantEditProfile extends AppCompatActivity {
                                 cbNotifications.setChecked(notifications);
                             }
 
-                            Boolean isAdmin = document.getBoolean("admin");
-                            if (isAdmin != null && isAdmin) {
+                            isAdmin = document.getBoolean("admin");
+                            if (isAdmin == null) { // Default to false if null
+                                isAdmin = false;
+                            }
+                            if (isAdmin) {
                                 tvAdminStatus.setText("Admin Status: Yes");
                             } else {
                                 tvAdminStatus.setText("Admin Status: Regular User");
@@ -169,7 +178,12 @@ public class EntrantEditProfile extends AppCompatActivity {
                         etEmail.setText(document.getString("email"));
                         Long phoneNumber = document.getLong("phoneNumber");
                         if (phoneNumber != null) {
-                            etPhone.setText(String.valueOf(phoneNumber));
+                            if(phoneNumber == 0) {
+                                etPhone.setText("");
+                            }
+                            else{
+                                etPhone.setText(String.valueOf(phoneNumber));
+                                }
                         }
                         String base64Image = document.getString("profileImage");
                         if (base64Image != null) {
@@ -234,8 +248,6 @@ public class EntrantEditProfile extends AppCompatActivity {
                 return;
             }
         }
-
-        boolean isAdmin = getIntent().getBooleanExtra("isAdmin", false);
 
         Map<String, Object> userData = new HashMap<>();
         userData.put("deviceId", deviceId);
