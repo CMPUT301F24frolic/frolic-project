@@ -83,6 +83,10 @@
         <activity
             android:name=".AdminFacilitiesActivity"
             android:exported="false" />
+        <activity
+            android:name=".EntrantMyEvents"
+            android:exported="false" />
+
     </application>
 
 </manifest>
