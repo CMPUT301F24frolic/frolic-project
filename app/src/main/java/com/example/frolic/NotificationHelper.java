@@ -172,15 +172,19 @@ public class NotificationHelper {
     }
 
 
-    // Delete all notifications for a specific device ID
+    // Delete only the "notifs" field from the specified document
     public void deleteNotifications(String deviceId) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("notifs", FieldValue.delete()); // Indicate that the "notifs" field should be deleted
+
         db.collection("notifications").document(deviceId)
-                .delete()
+                .update(updates)
                 .addOnSuccessListener(aVoid -> {
-                    Log.d("NotificationHelper", "All notifications deleted successfully.");
+                    Log.d("NotificationHelper", "Notifications deleted successfully.");
                 })
                 .addOnFailureListener(e -> {
                     Log.e("NotificationHelper", "Error deleting notifications: " + e.getMessage());
                 });
     }
+
 }
