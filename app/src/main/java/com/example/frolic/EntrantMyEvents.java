@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -76,7 +77,11 @@ public class EntrantMyEvents extends AppCompatActivity {
             return;
         }
 
-        lotteriesRef.whereArrayContains("waitingListIds", entrantId)
+        Filter waitingFilter = Filter.arrayContains("waitingListIds", entrantId);
+        Filter invitedFilter = Filter.arrayContains("invitedListIds", entrantId);
+        Filter confirmedFilter = Filter.arrayContains("confirmedListIds", entrantId);
+
+        lotteriesRef.where(Filter.or(waitingFilter, invitedFilter, confirmedFilter))
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
