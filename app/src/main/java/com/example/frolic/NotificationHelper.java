@@ -1,27 +1,21 @@
 package com.example.frolic;
 
-import android.content.Context;
-import android.util.Log;
-import android.widget.Toast;
-
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.SetOptions;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class NotificationHelper {
@@ -112,6 +106,8 @@ public class NotificationHelper {
                                 String message = notif.get("Message");
 
                                 if (title != null && message != null) {
+                                    NotificationStorageHelper.saveNotification(context, deviceId, title, message);
+
                                     displayNotification(context, title, message);
                                 }
                             }
