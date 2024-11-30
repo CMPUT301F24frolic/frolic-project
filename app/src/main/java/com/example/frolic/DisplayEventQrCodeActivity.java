@@ -1,7 +1,13 @@
 package com.example.frolic;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -13,6 +19,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 /**
  * DisplayEventQrCodeActivity retrieves a QR hash associated with an event from Firestore
@@ -107,6 +117,88 @@ public class DisplayEventQrCodeActivity extends AppCompatActivity {
      * Downloads the displayed QR code to the device's storage.
      */
     private void downloadQrCode() {
-        Toast.makeText(this, "Download functionality not yet implemented", Toast.LENGTH_SHORT).show();
+        // Get the ImageView containing the QR code
+        ImageView ivQrCode = findViewById(R.id.ivQrCode);
+        ivQrCode.setDrawingCacheEnabled(true);
+        Bitmap bitmap = ivQrCode.getDrawingCache();
+
+        if (bitmap != null) {
+            try {
+                // Generate a unique filename
+                String fileName = "EventQRCode_" + eventId + ".png";
+
+                // Save the image to the device's Pictures directory
+                String savedPath = saveImageToGallery(bitmap, fileName);
+
+                if (savedPath != null) {
+                    Toast.makeText(this, "QR code saved to: " + savedPath, Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, "Failed to save QR code", Toast.LENGTH_SHORT).show();
+                }
+            } catch (Exception e) {
+                Toast.makeText(this, "Error saving QR code: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
+        } else {
+            Toast.makeText(this, "QR code image not available", Toast.LENGTH_SHORT).show();
+        }
+        ivQrCode.setDrawingCacheEnabled(false);
+    }
+
+    /**
+     * Saves the given bitmap to the device's Pictures directory as a PNG file.
+     *
+     * @param bitmap   the bitmap to save
+     * @param fileName the name of the file
+     * @return the path to the saved file, or null if saving failed
+     */
+    private String saveImageToGallery(Bitmap bitmap, String fileName) {
+        String savedPath = null;
+
+        // For Android 10 and above
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            try {
+                ContentResolver resolver = getContentResolver();
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
+                contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
+                contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/FrolicEventQRs");
+
+                Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+
+                if (imageUri != null) {
+                    OutputStream outputStream = resolver.openOutputStream(imageUri);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                    outputStream.close();
+                    savedPath = imageUri.toString();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            // For Android versions below Q
+            File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            File qrDir = new File(picturesDir, "FrolicEventQRs");
+            if (!qrDir.exists()) {
+                qrDir.mkdirs();
+            }
+            File imageFile = new File(qrDir, fileName);
+            try {
+                FileOutputStream fos = new FileOutputStream(imageFile);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                fos.flush();
+                fos.close();
+                savedPath = imageFile.getAbsolutePath();
+
+                // Make the file visible in the gallery
+                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                mediaScanIntent.setData(Uri.fromFile(imageFile));
+                sendBroadcast(mediaScanIntent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return savedPath;
     }
 }
