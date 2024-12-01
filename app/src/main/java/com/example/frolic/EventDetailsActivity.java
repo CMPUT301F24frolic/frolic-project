@@ -36,6 +36,8 @@ public class EventDetailsActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String eventId;
     private boolean isGeolocationRequired = false;
+    private NotificationHelper notificationHelper;
+    private String organizerId;
 
     private FusedLocationProviderClient fusedLocationClient;
 
@@ -46,6 +48,9 @@ public class EventDetailsActivity extends AppCompatActivity {
 
         // Initialize location client
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // Initialize notification helper
+        notificationHelper = new NotificationHelper();
 
         // Initialize views
         tvEventName = findViewById(R.id.tvEventName);
@@ -92,6 +97,7 @@ public class EventDetailsActivity extends AppCompatActivity {
                 if (event != null) {
                     tvEventName.setText(event.getEventName() != null ? event.getEventName() : "No name available");
                     tvEventDate.setText(event.getEventDate() != null ? event.getEventDate().toString() : "No date available");
+                    organizerId = event.getOrganizerId();
                     fetchOrganizerName(event.getOrganizerId());
                     isGeolocationRequired = event.isGeolocationRequired();
 
@@ -138,10 +144,39 @@ public class EventDetailsActivity extends AppCompatActivity {
                                             .update(lotteryUpdates)
                                             .addOnSuccessListener(aVoid -> {
                                                 Log.d("joinEntrantsList", "invitedList updated successfully");
-                                                loadEventDetails(eventId);
+
+                                                // Notify the organizer about the change
+                                                db.collection("entrants").document(deviceId)
+                                                        .get()
+                                                        .addOnSuccessListener(documentSnapshot3 -> {
+                                                            if (documentSnapshot3.exists()) {
+                                                                // Get the entrant's name from the document
+                                                                String entrantName = documentSnapshot3.getString("name");
+                                                                String eventName = tvEventName.getText().toString();
+                                                                notificationHelper.addNotification(
+                                                                        this,
+                                                                        organizerId,
+                                                                        entrantName + " has joined your event",
+                                                                        entrantName + " has joined your event: " + eventName + "."
+                                                                );
+                                                                loadEventDetails(eventId);
+                                                                if (entrantName != null) {
+                                                                    // Do something with the entrant's name
+                                                                    Log.d("NotificationHelper", "Entrant Name: " + entrantName);
+                                                                } else {
+                                                                    Log.e("NotificationHelper", "Entrant name not found.");
+                                                                }
+                                                            } else {
+                                                                Log.e("NotificationHelper", "Entrant document does not exist.");
+                                                            }
+                                                        })
+                                                        .addOnFailureListener(e -> {
+                                                            Log.e("NotificationHelper", "Error retrieving entrant name: " + e.getMessage());
+                                                        });
                                             })
                                             .addOnFailureListener(e -> Log.e("joinEntrantsList", "Error updating invitedList", e));
                                 });
+
 
                                 btnDecline.setOnClickListener(v -> {
                                     lottery.removeFromInvitedList(deviceId);
@@ -154,11 +189,39 @@ public class EventDetailsActivity extends AppCompatActivity {
                                             .update(updates)
                                             .addOnSuccessListener(aVoid -> {
                                                 Log.d("declineInvitation", "invitedListIds and canceledListIds updated successfully");
-                                                loadEventDetails(eventId);
+
+                                                // Notify the organizer about the change
+                                                db.collection("entrants").document(deviceId)
+                                                        .get()
+                                                        .addOnSuccessListener(documentSnapshot3 -> {
+                                                            if (documentSnapshot3.exists()) {
+                                                                // Get the entrant's name from the document
+                                                                String entrantName = documentSnapshot3.getString("name");
+                                                                String eventName = tvEventName.getText().toString();
+                                                                notificationHelper.addNotification(
+                                                                        this,
+                                                                        organizerId,
+                                                                        "User declined your invitation",
+                                                                        entrantName + " has declined your invitation for event: " + eventName + "."
+                                                                );
+                                                                loadEventDetails(eventId);
+                                                                if (entrantName != null) {
+                                                                    // Do something with the entrant's name
+                                                                    Log.d("NotificationHelper", "Entrant Name: " + entrantName);
+                                                                } else {
+                                                                    Log.e("NotificationHelper", "Entrant name not found.");
+                                                                }
+                                                            } else {
+                                                                Log.e("NotificationHelper", "Entrant document does not exist.");
+                                                            }
+                                                        })
+                                                        .addOnFailureListener(e -> {
+                                                            Log.e("NotificationHelper", "Error retrieving entrant name: " + e.getMessage());
+                                                        });
                                             })
                                             .addOnFailureListener(e -> Log.e("declineInvitation", "Error updating invitedListIds and canceledListIds", e));
-
                                 });
+
                             }
                             else if (lottery.getConfirmedListIds().contains(deviceId)) {
                                 // User is already an entrant

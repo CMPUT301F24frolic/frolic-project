@@ -32,7 +32,13 @@ public class NotificationHelper {
         db = FirebaseFirestore.getInstance();
     }
 
-    // Add a notification to the array in the specified document
+    /**
+     * Adds a notification to the Firestore database.
+     * @param context the application context
+     * @param deviceId the device ID associated with the notification
+     * @param title the title of the notification
+     * @param message the body of the notification
+     */
     public void addNotification(Context context, String deviceId, String title, String message) {
         db.collection("notifications").document(deviceId)
                 .get()
@@ -69,7 +75,11 @@ public class NotificationHelper {
     }
 
 
-    // Retrieve all notifications for a specific device ID
+    /**
+     * Checks if notifications are enabled for the entrant and fetches and displays notifications if enabled.
+     * @param context the application context to send the toast message
+     * @param deviceId the device ID associated with the notification
+     */
     public void getNotifications(Context context, String deviceId) {
         // Check if notifications are enabled for the entrant
         db.collection("entrants").document(deviceId)
@@ -96,7 +106,9 @@ public class NotificationHelper {
     }
 
     /**
-     * Fetch notifications from Firestore and display them locally.
+     * Fetches and displays notifications from the Firestore database.
+     * @param context the application context to send the toast message
+     * @param deviceId the device ID associated with the notification
      */
     private void fetchAndDisplayNotifications(Context context, String deviceId) {
         db.collection("notifications").document(deviceId)
@@ -134,7 +146,6 @@ public class NotificationHelper {
 
     /**
      * Displays a local notification using the Android NotificationManager.
-     *
      * @param context the application context
      * @param title   the title of the notification
      * @param message the body of the notification
@@ -172,10 +183,13 @@ public class NotificationHelper {
     }
 
 
-    // Delete only the "notifs" field from the specified document
+    /**
+     * Deletes all notifications from the Firestore database from the associated device
+     * @param deviceId the device ID associated with the notifications
+     */
     public void deleteNotifications(String deviceId) {
         Map<String, Object> updates = new HashMap<>();
-        updates.put("notifs", FieldValue.delete()); // Indicate that the "notifs" field should be deleted
+        updates.put("notifs", FieldValue.delete());
 
         db.collection("notifications").document(deviceId)
                 .update(updates)

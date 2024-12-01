@@ -315,30 +315,14 @@ public class EntrantDetailsActivity extends AppCompatActivity {
                                     return;
                                 }
 
-                                // Safely retrieve lists
-                                ArrayList<String> invitedList = (ArrayList<String>) lotterySnapshot.get("invitedListIds");
-                                ArrayList<String> waitingList = (ArrayList<String>) lotterySnapshot.get("waitingListIds");
-                                ArrayList<String> canceledList = (ArrayList<String>) lotterySnapshot.get("canceledListIds");
-
-                                // Avoid null lists
-                                invitedList = invitedList != null ? invitedList : new ArrayList<>();
-                                waitingList = waitingList != null ? waitingList : new ArrayList<>();
-                                canceledList = canceledList != null ? canceledList : new ArrayList<>();
+                                ArrayList<String> confirmedList = (ArrayList<String>) lotterySnapshot.get("confirmedListIds");
 
                                 // Send notifications
-                                sendNotifications(invitedList,
-                                        "Reminder of your acceptance",
-                                        "The organizer of " + eventName + " wants to remind you to accept or decline your invitation!");
+                                sendNotifications(confirmedList,
+                                        "Reminder of your commitment",
+                                        "The organizer of " + eventName + " wants to remind you that you are confirmed for the event!");
 
-                                sendNotifications(waitingList,
-                                        "Reminder of your waiting",
-                                        "The organizer of " + eventName + " wants to remind you that you are still waiting for the lottery!");
-
-                                sendNotifications(canceledList,
-                                        "Reminder of your cancellation",
-                                        "The organizer of " + eventName + " wants to remind you that you have been canceled for the event.");
-
-                                Toast.makeText(this, "Notifications sent to all entrants.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, "Notifications sent to all confirmed entrants.", Toast.LENGTH_SHORT).show();
                             })
                             .addOnFailureListener(e -> {
                                 Log.e("notifyAllEntrants", "Error retrieving lottery details: " + e.getMessage());
