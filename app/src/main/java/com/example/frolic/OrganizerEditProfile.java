@@ -121,7 +121,7 @@ public class OrganizerEditProfile extends AppCompatActivity {
                 startActivity(intent);
             } else {
                 // Navigate back to EntrantDashboardActivity
-                Intent intent = new Intent(this, EntrantDashboardActivity.class);
+                Intent intent = new Intent(this, OrganizerDashboardActivity.class);
                 intent.putExtra("deviceId", deviceId);
                 startActivity(intent);
             }
