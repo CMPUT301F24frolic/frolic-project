@@ -1,8 +1,11 @@
 package com.example.frolic;
-import org.junit.Before;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,7 +45,7 @@ public class EntrantTest {
     @Test
     public void testSetEventsEntered() {
         // Test setting a list of events for the entrant
-        Event testEvent = new Event("event123", "organizer123", "facility123", "Sample Event", 10, 5, new Date(), new Date(), true, true, "hash123");
+        Event testEvent = new Event("event123", "organizer123", "facility123", "Sample Event", 10, 5, new Date(), new Date(), true, true, "hash123", "https://picsum.photos/200/300");
         ArrayList<Event> events = new ArrayList<>();
         events.add(testEvent);
         testEntrant.setEventsEntered(events);
@@ -54,7 +57,7 @@ public class EntrantTest {
     @Test
     public void testAddEventToEntrant() {
         // Test adding an event to the entrant's event list
-        Event testEvent = new Event("event123", "organizer123", "facility123", "Sample Event", 10, 5, new Date(), new Date(), true, true, "hash123");
+        Event testEvent = new Event("event123", "organizer123", "facility123", "Sample Event", 10, 5, new Date(), new Date(), true, true, "hash123", "https://picsum.photos/200/300");
         testEntrant.getEventsEntered().add(testEvent);
 
         assertEquals(1, testEntrant.getEventsEntered().size());
@@ -64,7 +67,7 @@ public class EntrantTest {
     @Test
     public void testRemoveEventFromEntrant() {
         // Test removing an event from the entrant's event list
-        Event testEvent = new Event("event123", "organizer123", "facility123", "Sample Event", 10, 5, new Date(), new Date(), true, true, "hash123");
+        Event testEvent = new Event("event123", "organizer123", "facility123", "Sample Event", 10, 5, new Date(), new Date(), true, true, "hash123", "https://picsum.photos/200/300");
         testEntrant.getEventsEntered().add(testEvent);
         testEntrant.getEventsEntered().remove(testEvent);
 
