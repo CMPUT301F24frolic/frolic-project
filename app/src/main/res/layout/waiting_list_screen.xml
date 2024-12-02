@@ -67,13 +67,13 @@
         android:id="@+id/btnNotifyAllEntrants"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Notify All Entrants"
-        android:backgroundTint="#5DB075"
-        android:textColor="@android:color/white"
         android:layout_marginHorizontal="24dp"
         android:layout_marginBottom="24dp"
+        android:backgroundTint="#5DB075"
+        android:text="Notify All Waiting Users"
+        android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

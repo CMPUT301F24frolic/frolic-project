@@ -2,23 +2,23 @@ package com.example.frolic;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Activity for displaying notifications for a specific device ID.
@@ -60,7 +60,7 @@ public class NotificationsActivity extends AppCompatActivity {
 
         // Load notifications from Firestore if the device ID is available
         if (deviceId != null) {
-            loadNotifications(deviceId);
+            loadNotifications();
         } else {
             Toast.makeText(this, "Device ID is missing", Toast.LENGTH_SHORT).show();
         }
@@ -68,33 +68,30 @@ public class NotificationsActivity extends AppCompatActivity {
 
     /**
      * Loads notifications for the specified device ID from Firestore.
-     *
-     * @param deviceId The device ID to load notifications for.
      */
-    private void loadNotifications(String deviceId) {
-        // Query the notifications collection based on the device ID and its sub-collection "messages"
-        notificationsRef.document(deviceId).collection("messages").get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        notificationList.clear();
-                        for (DocumentSnapshot document : task.getResult()) {
-                            String message = document.getString("message");
-                            if (message != null) {
-                                notificationList.add(message);
-                            }
-                        }
-                        adapter.notifyDataSetChanged();
-                    } else {
-                        Log.w(TAG, "Error getting notifications.", task.getException());
-                        Toast.makeText(NotificationsActivity.this, "Failed to load notifications.", Toast.LENGTH_SHORT).show();
-                    }
-                });
+    private void loadNotifications() {
+        List<NotificationStorageHelper.NotificationItem> notifications =
+                NotificationStorageHelper.getNotifications(this, deviceId);
+
+        notificationList.clear();
+        for (NotificationStorageHelper.NotificationItem notif : notifications) {
+            notificationList.add(notif.getTitle() + "\n" + notif.getMessage());
+        }
+
+        adapter.notifyDataSetChanged();
+
+        if (notificationList.isEmpty()) {
+            Toast.makeText(NotificationsActivity.this,
+                    "No notifications found.", Toast.LENGTH_SHORT).show();
+        }
     }
+}
+
 
     /**
      * Adapter class for displaying notifications in a RecyclerView.
      */
-    private class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdapter.NotificationViewHolder> {
+    class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdapter.NotificationViewHolder> {
 
         private ArrayList<String> notifications;
 
@@ -129,8 +126,11 @@ public class NotificationsActivity extends AppCompatActivity {
                 super(itemView);
                 notificationText = itemView.findViewById(R.id.tvNotificationText);
             }
+
+
         }
+
     }
-}
+
 
 

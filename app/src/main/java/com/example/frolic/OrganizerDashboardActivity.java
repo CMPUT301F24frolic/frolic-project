@@ -22,6 +22,7 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String deviceId;
     private String facilityId;
+    private NotificationHelper notificationHelper;
 
     /**
      * Initializes the dashboard activity, setting up click listeners for
@@ -37,6 +38,10 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         deviceId = getIntent().getStringExtra("deviceId");
+
+        // Grab notifications
+        notificationHelper = new NotificationHelper();
+        notificationHelper.getNotifications(this, getIntent().getStringExtra("deviceId"));
 
         // Fetch facilityId based on the organizer ID
         db.collection("organizers")

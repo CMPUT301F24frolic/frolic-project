@@ -22,7 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class EntrantDashboardActivity extends AppCompatActivity {
     private static final String TAG = "EntrantDashboard";
     private FirebaseFirestore db;
-
+    private NotificationHelper notificationHelper;
     /**
      * Initializes the dashboard activity, setting up click listeners for
      * navigation options and displaying user information.
@@ -39,6 +39,10 @@ public class EntrantDashboardActivity extends AppCompatActivity {
 
         // Initialize views and set up click listeners
         setupNavigationOptions();
+
+        // Grab notifications
+        notificationHelper = new NotificationHelper();
+        notificationHelper.getNotifications(this, getIntent().getStringExtra("deviceId"));
 
         // Set up action bar title
         if (getSupportActionBar() != null) {
@@ -71,7 +75,6 @@ public class EntrantDashboardActivity extends AppCompatActivity {
     private void setupNavigationOptions() {
         TextView viewEvents = findViewById(R.id.tvViewEvents);
         TextView myEvents = findViewById(R.id.tvMyEvents);
-        TextView notifications = findViewById(R.id.tvNotifications);
         TextView profile = findViewById(R.id.tvProfile);
         Button scanQR = findViewById(R.id.btnScanQR);
 
@@ -93,15 +96,6 @@ public class EntrantDashboardActivity extends AppCompatActivity {
             intent.putExtra("deviceId", getIntent().getStringExtra("deviceId"));  // Pass device ID if needed
             startActivity(intent);
 
-        });
-
-        notifications.setOnClickListener(v -> {
-            // TODO: Navigate to notifications
-            // Intent intent = new Intent(this, NotificationsActivity.class);
-            // startActivity(intent);
-            Intent intent = new Intent(this, NotificationsActivity.class);
-            intent.putExtra("deviceId", getIntent().getStringExtra("deviceId"));
-            startActivity(intent);
         });
 
         profile.setOnClickListener(v -> {
