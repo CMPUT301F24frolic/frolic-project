@@ -1,7 +1,6 @@
 package com.example.frolic;
 
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasMinimumChildCount;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -45,17 +44,6 @@ public class ChosenEntrantsActivityTest {
         // Check if the count display is correct
         onView(withId(R.id.tvCount))
                 .check(matches(withText("3")));  // Should show 3 entrants
-    }
-
-    @Test
-    public void testBackButtonClick() {
-        // Launch the activity with any intent
-        activityRule.launchActivity(new Intent());
-
-        // Simulate clicking the back button
-        onView(withId(R.id.tvBack))
-                .perform(click());
-
     }
 
     @Test

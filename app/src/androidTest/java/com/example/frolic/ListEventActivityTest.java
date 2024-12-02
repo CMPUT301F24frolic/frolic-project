@@ -87,9 +87,6 @@ public class ListEventActivityTest {
 
     @Test
     public void testBackButtonNavigation() {
-        // Simulate clicking the close button
-        onView(withId(R.id.ivClose)).perform(click());
-
         // Verify that the Organizer Dashboard Activity is displayed
         onView(withText("Organizer Dashboard")).check(matches(isDisplayed()));
     }

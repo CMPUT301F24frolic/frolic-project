@@ -1,13 +1,16 @@
 package com.example.frolic;
-import org.junit.Before;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Date;
 
 public class EventTest {
+
     private Event event;
     private String eventId = "event123";
     private String organizerId = "organizer456";
@@ -20,6 +23,7 @@ public class EventTest {
     private boolean geolocationRequired = true;
     private boolean receiveNotification = true;
     private String qrHash = "QRHASH123";
+    private String eventImageUrl = "https://example.com/event-image.jpg"; // Adding image URL
 
     private Identity identity;
     private Entrant entrant;
@@ -29,15 +33,15 @@ public class EventTest {
     @BeforeEach
     public void setUp() {
         // Initialize Event object with the provided constructor
-        event = new Event(eventId, organizerId, facilityId, eventName, maxConfirmed, waitlistLimit, eventDate, enrollDate, geolocationRequired, receiveNotification, qrHash);
+        event = new Event(eventId, organizerId, facilityId, eventName, maxConfirmed, waitlistLimit, eventDate, enrollDate, geolocationRequired, receiveNotification, qrHash, eventImageUrl);
 
         // Initialize additional required objects
         identity = new Identity("User123");
         entrant = new Entrant(identity);
 
         // Initialize more Event objects for the Entrant tests
-        event1 = new Event("event001", "organizer1", "facility1", "Event 1", 100, 50, new Date(), new Date(), true, true, "QRHASH1");
-        event2 = new Event("event002", "organizer2", "facility2", "Event 2", 100, 50, new Date(), new Date(), true, true, "QRHASH2");
+        event1 = new Event("event001", "organizer1", "facility1", "Event 1", 100, 50, new Date(), new Date(), true, true, "QRHASH1", "https://example.com/event1-image.jpg");
+        event2 = new Event("event002", "organizer2", "facility2", "Event 2", 100, 50, new Date(), new Date(), true, true, "QRHASH2", "https://example.com/event2-image.jpg");
     }
 
     @Test
@@ -54,6 +58,7 @@ public class EventTest {
         assertTrue(event.isGeolocationRequired());
         assertTrue(event.isReceiveNotification());
         assertEquals(qrHash, event.getQrHash());
+        assertEquals(eventImageUrl, event.getEventImageUrl()); // Verify eventImageUrl
     }
 
     @Test
