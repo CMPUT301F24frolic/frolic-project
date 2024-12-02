@@ -49,6 +49,7 @@ public class EntrantEditProfile extends AppCompatActivity {
     private CheckBox cbNotifications;
     private TextView tvAdminStatus, tvDeviceId;
     private Button btnUploadImage, btnRemoveImage, btnSaveChanges, btnBack;
+    private Boolean isAdmin;
 
     private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -130,15 +131,6 @@ public class EntrantEditProfile extends AppCompatActivity {
         }
     }
 
-                            Long phoneNumber = document.getLong("phoneNumber");
-                            if (phoneNumber != null) {
-                                if (phoneNumber == 0) {
-                                    etPhone.setText("");
-                                } else {
-                                    etPhone.setText(String.valueOf(phoneNumber));
-
-                                }
-                            }
     /**
      * Copies existing profile data from organizer profile when creating new entrant profile
      */
@@ -149,7 +141,11 @@ public class EntrantEditProfile extends AppCompatActivity {
         etEmail.setText((String) data.get("email"));
         Long phoneNumber = (Long) data.get("phoneNumber");
         if (phoneNumber != null) {
-            etPhone.setText(String.valueOf(phoneNumber));
+            if (phoneNumber == 0) {
+                etPhone.setText("");
+            } else {
+                etPhone.setText(String.valueOf(phoneNumber));
+            }
         }
 
         Boolean notifications = (Boolean) data.get("notifications");
@@ -157,7 +153,7 @@ public class EntrantEditProfile extends AppCompatActivity {
             cbNotifications.setChecked(notifications);
         }
 
-        isAdmin = document.getBoolean("admin");
+        Boolean isAdmin = (Boolean) data.get("admin");
         if (isAdmin == null) { // Default to false if null
             isAdmin = false;
         }
@@ -314,6 +310,7 @@ public class EntrantEditProfile extends AppCompatActivity {
             etEmail.setError("Invalid email format");
             return;
         }
+
         // Validate Phone Number (only if provided)
         if (!phoneStr.isEmpty()) {
             if (!phoneStr.matches("\\d{9,}")) { // Ensures at least 9 digits
@@ -322,20 +319,34 @@ public class EntrantEditProfile extends AppCompatActivity {
             }
         }
 
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("deviceId", deviceId);
-        userData.put("name", name);
-        userData.put("email", email);
-        userData.put("phoneNumber", phoneStr.isEmpty() ? 0 : Long.parseLong(phoneStr));
-        userData.put("notifications", cbNotifications.isChecked());
-        userData.put("admin", getIntent().getBooleanExtra("isAdmin", false));
+        // First, get the current admin status from Firestore
+        db.collection("entrants").document(deviceId).get()
+                .addOnSuccessListener(document -> {
+                    Map<String, Object> userData = new HashMap<>();
+                    userData.put("deviceId", deviceId);
+                    userData.put("name", name);
+                    userData.put("email", email);
+                    userData.put("phoneNumber", phoneStr.isEmpty() ? 0 : Long.parseLong(phoneStr));
+                    userData.put("notifications", cbNotifications.isChecked());
 
-        if (selectedImageUri != null) {
-            handleImageInFirestore(userData);
-        } else {
-            userData.put("profileImage", generateDefaultProfilePicture(name));
-            saveProfileData(userData);
-        }
+                    // Preserve existing admin status if document exists, otherwise use intent extra
+                    if (document.exists() && document.contains("admin")) {
+                        userData.put("admin", document.getBoolean("admin"));
+                    } else {
+                        userData.put("admin", getIntent().getBooleanExtra("isAdmin", false));
+                    }
+
+                    if (selectedImageUri != null) {
+                        handleImageInFirestore(userData);
+                    } else {
+                        userData.put("profileImage", generateDefaultProfilePicture(name));
+                        saveProfileData(userData);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error checking admin status", e);
+                    Toast.makeText(this, "Error saving profile", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void handleImageInFirestore(Map<String, Object> userData) {
