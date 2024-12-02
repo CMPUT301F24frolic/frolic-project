@@ -5,6 +5,23 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- Event Image -->
+    <FrameLayout
+        android:id="@+id/flEventImageContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_marginBottom="16dp">
+
+        <ImageView
+            android:id="@+id/ivEventImage"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:contentDescription="Event Image"
+            android:background="#E0E0E0" />
+    </FrameLayout>
+
     <TextView
         android:id="@+id/tvEventName"
         android:layout_width="wrap_content"

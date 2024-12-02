@@ -45,15 +45,6 @@
             android:layout_marginTop="8dp" />
 
         <TextView
-            android:id="@+id/tvNotifications"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Notifications"
-            android:background="@android:color/darker_gray"
-            android:padding="16dp"
-            android:layout_marginTop="8dp" />
-
-        <TextView
             android:id="@+id/tvMyProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

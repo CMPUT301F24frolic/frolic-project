@@ -22,6 +22,7 @@ public class Event {
     private boolean geolocationRequired;
     private boolean receiveNotification;
     private String qrHash;
+    private String eventImageUrl;
 
     /**
      * Main constructor for creating an event.
@@ -37,8 +38,9 @@ public class Event {
      * @param geolocationRequired Whether geolocation is required for the event
      * @param receiveNotification Whether notifications are enabled for the event
      * @param qrHash             The hash for the event's QR code
+     * @param eventImageUrl      The URL for the event's image
      */
-    public Event(String eventId, String organizerId, String facilityId, String eventName, int maxConfirmed, int waitlistLimit, Date eventDate, Date enrollDate, boolean geolocationRequired, boolean receiveNotification, String qrHash) {
+    public Event(String eventId, String organizerId, String facilityId, String eventName, int maxConfirmed, int waitlistLimit, Date eventDate, Date enrollDate, boolean geolocationRequired, boolean receiveNotification, String qrHash, String eventImageUrl) {
 
         this.eventId = eventId;
         this.organizerId = organizerId;
@@ -51,6 +53,7 @@ public class Event {
         this.geolocationRequired = geolocationRequired;
         this.receiveNotification = receiveNotification;
         this.qrHash = qrHash;
+        this.eventImageUrl = eventImageUrl;
         this.lotterySystemId = eventId + "_lottery"; // Unique ID for the lottery system
     }
 
@@ -81,6 +84,7 @@ public class Event {
         eventMap.put("receiveNotification", receiveNotification);
         eventMap.put("qrHash", qrHash);
         eventMap.put("lotterySystemId", lotterySystemId);
+        eventMap.put("eventImageUrl", eventImageUrl);
         return eventMap;
     }
 
@@ -111,8 +115,6 @@ public class Event {
 
 
     // Getters and Setters
-    // Some of these may be redundant. Feel free to remove later if they seem that way
-    // TODO: add Javadocs
 
     public String getEventName() {
         return eventName;
@@ -122,6 +124,13 @@ public class Event {
         this.eventName = eventName;
     }
 
+    public String getEventImageUrl() {
+        return eventImageUrl;
+    }
+
+    public void setEventImageUrl(String eventImageUrl) {
+        this.eventImageUrl = eventImageUrl;
+    }
 
     public ArrayList<String> getEntrantIds() {
         return entrantIds;

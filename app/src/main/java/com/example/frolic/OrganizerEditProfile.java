@@ -144,7 +144,13 @@ public class OrganizerEditProfile extends AppCompatActivity {
 
                             Long phoneNumber = document.getLong("phoneNumber");
                             if (phoneNumber != null) {
-                                etPhone.setText(String.valueOf(phoneNumber));
+                                if (phoneNumber == 0) {
+                                    etPhone.setText("");
+                                    return;
+                                }
+                                else {
+                                    etPhone.setText(String.valueOf(phoneNumber));
+                                }
                             }
 
                             Boolean notifications = document.getBoolean("notifications");
@@ -201,7 +207,13 @@ public class OrganizerEditProfile extends AppCompatActivity {
                         etEmail.setText(document.getString("email"));
                         Long phoneNumber = document.getLong("phoneNumber");
                         if (phoneNumber != null) {
-                            etPhone.setText(String.valueOf(phoneNumber));
+                            if (phoneNumber == 0) {
+                                etPhone.setText("");
+                                return;
+                            }
+                            else {
+                                etPhone.setText(String.valueOf(phoneNumber));
+                            }
                         }
                         String base64Image = document.getString("profileImage");
                         if (base64Image != null) {

@@ -113,4 +113,17 @@ public class EntrantEditProfileTest {
         onView(withId(R.id.btnSaveChanges)).perform(click());
 
     }
+    /**
+     * Test removing the profile picture.
+     */
+    @Test
+    public void testRemoveProfileImage() {
+        onView(withId(R.id.btnRemoveImage)).perform(click());
+        // Verify the ImageView no longer displays an image
+        onView(withId(R.id.ivProfileImage)).check(matches(isDisplayed()));
+    }
+
+
+
+
 }

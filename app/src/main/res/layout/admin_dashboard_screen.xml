@@ -12,8 +12,6 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="Back"
-        android:textColor="#5DB075"
-        android:backgroundTint="@android:color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -62,6 +60,15 @@
             android:text="Manage Facilities"
             android:padding="16dp"
             android:background="@android:color/darker_gray"/>
+
+        <TextView
+            android:id="@+id/tvManageImages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Manage Images"
+            android:layout_marginTop="10dp"
+            android:padding="16dp"
+            android:background="@android:color/darker_gray" />
 
     </LinearLayout>
 

@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String deviceId;
     private ProgressDialog progressDialog;
+    private NotificationHelper notificationHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +29,10 @@ public class MainActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         Log.d(TAG, "Device ID: " + deviceId);
+
+        notificationHelper = new NotificationHelper();
+
+        notificationHelper.getNotifications(this, deviceId);
 
         setupProgressDialog();
         checkExistingUser();

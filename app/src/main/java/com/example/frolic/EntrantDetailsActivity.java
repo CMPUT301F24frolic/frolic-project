@@ -38,6 +38,7 @@ public class EntrantDetailsActivity extends AppCompatActivity {
     private ArrayList<String> canceledListIds = new ArrayList<>();
     private FirebaseFirestore db;
     private String eventId;
+    private NotificationHelper notificationHelper;
 
     /**
      * Initializes the activity, setting up Firebase, retrieving event data from the intent, and
@@ -68,6 +69,8 @@ public class EntrantDetailsActivity extends AppCompatActivity {
         adapter = new EntrantsAdapter(confirmedEntrantIds); // Pass the list of entrant IDs
         rvEntrants.setAdapter(adapter);
 
+        notificationHelper = new NotificationHelper();
+
         loadEntrantDetails();
 
         TextView tvBack = findViewById(R.id.tvBack);
@@ -83,6 +86,9 @@ public class EntrantDetailsActivity extends AppCompatActivity {
 
         // Set up lottery picking
         btnPickEntrants.setOnClickListener(v -> pickEntrants());
+
+        // Set up notification sending
+        btnNotifyAllEntrants.setOnClickListener(v -> notifyAllEntrants());
     }
 
     @Override
@@ -100,42 +106,107 @@ public class EntrantDetailsActivity extends AppCompatActivity {
         db.collection("lotteries").document(eventId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        LotterySystem lottery = documentSnapshot.toObject(LotterySystem.class);
-
-                        if (lottery == null) {
-                            Log.e("PickEntrants", "LotterySystem is null");
-                            return;
-                        }
-
-                        lottery.drawLottery();
-
-                        ArrayList<String> inviteds = lottery.getInvitedListIds();
-                        ArrayList<String> waitings = lottery.getWaitingListIds();
-
-                        for (int i = 0; i < inviteds.size(); i++) {
-                            Log.d("", "" + inviteds.get(i));
-                        }
-
-                        Map<String, Object> updates = new HashMap<>();
-                        updates.put("invitedListIds", inviteds);
-                        updates.put("waitingListIds", waitings);
-
-                        db.collection("lotteries").document(eventId)
-                                .update(updates)
-                                .addOnSuccessListener(aVoid -> {
-                                    Log.d("PickEntrants", "invitedListIds updated successfully");
-                                    loadEntrantDetails();
-                                })
-                                .addOnFailureListener(e -> Log.e("PickEntrants", "Error updating invitedListIds", e));
-
-                        Log.d("PickEntrants", "Max attendees: " + lottery.getMaxAttendees());
-                    } else {
-                        Log.d("EventRead", "No such event found");
+                    if (!documentSnapshot.exists()) {
+                        Log.e("PickEntrants", "Lottery document not found for eventId: " + eventId);
+                        Toast.makeText(this, "Lottery not found!", Toast.LENGTH_SHORT).show();
+                        return;
                     }
+
+                    LotterySystem lottery = documentSnapshot.toObject(LotterySystem.class);
+                    if (lottery == null) {
+                        Log.e("PickEntrants", "LotterySystem object is null");
+                        return;
+                    }
+
+                    // Capture state before changes
+                    ArrayList<String> prevInviteds = new ArrayList<>(lottery.getInvitedListIds());
+
+                    // Perform the lottery draw
+                    lottery.drawLottery();
+
+                    // Calculate differences
+                    ArrayList<String> newInviteds = new ArrayList<>(lottery.getInvitedListIds());
+                    ArrayList<String> diff = new ArrayList<>(newInviteds);
+                    diff.removeAll(prevInviteds);
+
+                    // Debugging info
+                    Log.d("PickEntrants", "New inviteds: " + newInviteds);
+                    Log.d("PickEntrants", "Difference (new picks): " + diff);
+
+                    // Prepare updates
+                    Map<String, Object> updates = new HashMap<>();
+                    updates.put("invitedListIds", newInviteds);
+                    updates.put("waitingListIds", lottery.getWaitingListIds());
+
+                    // Update Firestore
+                    db.collection("lotteries").document(eventId)
+                            .update(updates)
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d("PickEntrants", "Firestore updated successfully");
+
+                                // Fetch event details to build the notification message
+                                db.collection("events").document(eventId)
+                                        .get()
+                                        .addOnSuccessListener(eventSnapshot -> {
+                                            if (!eventSnapshot.exists()) {
+                                                Log.e("sendNotifications", "Event not found for eventId: " + eventId);
+                                                return;
+                                            }
+
+                                            String eventTitle = eventSnapshot.getString("eventName");
+                                            if (eventTitle == null) {
+                                                Log.e("sendNotifications", "Event name is null");
+                                                return;
+                                            }
+
+                                            // Send notifications to winners
+                                            String title = "Invited to " + eventTitle;
+                                            String body = "Congrats! You have been picked by the lottery for " + eventTitle + "!";
+                                            sendNotifications(diff, title, body);
+
+                                            // Send notifications to losers
+                                            title = "Lost lottery for " + eventTitle;
+                                            body = "Sorry! The lottery has been pulled and you have not been picked for " + eventTitle + ".";
+                                            sendNotifications(waitingListIds, title, body);
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("sendNotifications", "Error retrieving event details", e);
+                                        });
+
+                                loadEntrantDetails();
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("PickEntrants", "Error updating Firestore", e);
+                                Toast.makeText(this, "Failed to update lottery!", Toast.LENGTH_SHORT).show();
+                            });
                 })
-                .addOnFailureListener(e -> Log.e("EventRead", "Error fetching event", e));
+                .addOnFailureListener(e -> {
+                    Log.e("PickEntrants", "Error fetching lottery document", e);
+                    Toast.makeText(this, "Error loading lottery details", Toast.LENGTH_SHORT).show();
+                });
     }
+
+
+    /**
+     * Sends notifications to a list of recipients with a given title and body.
+     *
+     * @param recipientIds the list of recipient IDs to notify
+     * @param title the title of the notification
+     * @param body the body of the notification
+     */
+    private void sendNotifications(ArrayList<String> recipientIds, String title, String body) {
+        for (String recipientId : recipientIds) {
+            notificationHelper.addNotification(
+                    this,
+                    recipientId,
+                    title,
+                    body
+            );
+        }
+
+        Log.d("sendNotifications", "Notifications sent to: " + recipientIds);
+    }
+
 
 
 
@@ -146,27 +217,37 @@ public class EntrantDetailsActivity extends AppCompatActivity {
     private void loadEntrantDetails() {
         db.collection("lotteries").document(eventId).get()
                 .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        // Retrieve each list from Firestore document
-                        waitingListIds = (ArrayList<String>) documentSnapshot.get("waitingListIds");
-                        chosenListIds = (ArrayList<String>) documentSnapshot.get("invitedListIds");
-                        canceledListIds = (ArrayList<String>) documentSnapshot.get("canceledListIds");
-                        confirmedEntrantIds = (ArrayList<String>) documentSnapshot.get("confirmedListIds");
-
-                        // Update counts on the UI
-                        tvWaitingListCount.setText(String.valueOf(waitingListIds.size()));
-                        tvChosenCount.setText(String.valueOf(chosenListIds.size()));
-                        tvCanceledCount.setText(String.valueOf(canceledListIds.size()));
-
-                        // Load confirmed entrants into the RecyclerView
-                        adapter.updateEntrantsList(confirmedEntrantIds);
+                    if (!documentSnapshot.exists()) {
+                        Log.e("loadEntrantDetails", "Lottery document not found for eventId: " + eventId);
+                        return;
                     }
+
+                    // Safely retrieve lists
+                    waitingListIds = (ArrayList<String>) documentSnapshot.get("waitingListIds");
+                    chosenListIds = (ArrayList<String>) documentSnapshot.get("invitedListIds");
+                    canceledListIds = (ArrayList<String>) documentSnapshot.get("canceledListIds");
+                    confirmedEntrantIds = (ArrayList<String>) documentSnapshot.get("confirmedListIds");
+
+                    // Avoid nulls
+                    waitingListIds = waitingListIds != null ? waitingListIds : new ArrayList<>();
+                    chosenListIds = chosenListIds != null ? chosenListIds : new ArrayList<>();
+                    canceledListIds = canceledListIds != null ? canceledListIds : new ArrayList<>();
+                    confirmedEntrantIds = confirmedEntrantIds != null ? confirmedEntrantIds : new ArrayList<>();
+
+                    // Update UI
+                    tvWaitingListCount.setText(String.valueOf(waitingListIds.size()));
+                    tvChosenCount.setText(String.valueOf(chosenListIds.size()));
+                    tvCanceledCount.setText(String.valueOf(canceledListIds.size()));
+
+                    // Update RecyclerView
+                    adapter.updateEntrantsList(confirmedEntrantIds);
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("EntrantDetailsActivity", "Error loading lottery system data", e);
+                    Log.e("loadEntrantDetails", "Error loading lottery system data", e);
                     Toast.makeText(this, "Error loading entrant details", Toast.LENGTH_SHORT).show();
                 });
     }
+
 
     /**
      * Displays a filter menu allowing the user to filter entrants by status (Waiting List, Chosen, or Canceled).
@@ -213,4 +294,53 @@ public class EntrantDetailsActivity extends AppCompatActivity {
         }
         return false;
     }
+
+    /**
+     * Sends notifications to all entrants in all lists (invited, waiting, canceled) for the event.
+     */
+    public void notifyAllEntrants() {
+        db.collection("events").document(eventId)
+                .get()
+                .addOnSuccessListener(eventSnapshot -> {
+                    if (!eventSnapshot.exists()) {
+                        Log.e("notifyAllEntrants", "Event document not found for eventId: " + eventId);
+                        Toast.makeText(this, "Event not found!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    String eventName = eventSnapshot.getString("eventName");
+                    if (eventName == null) {
+                        Log.e("notifyAllEntrants", "Event name is null for eventId: " + eventId);
+                        return;
+                    }
+
+                    db.collection("lotteries").document(eventId)
+                            .get()
+                            .addOnSuccessListener(lotterySnapshot -> {
+                                if (!lotterySnapshot.exists()) {
+                                    Log.e("notifyAllEntrants", "Lottery document not found for eventId: " + eventId);
+                                    Toast.makeText(this, "Lottery details not found!", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+
+                                ArrayList<String> confirmedList = (ArrayList<String>) lotterySnapshot.get("confirmedListIds");
+
+                                // Send notifications
+                                sendNotifications(confirmedList,
+                                        "Reminder of your commitment",
+                                        "The organizer of " + eventName + " wants to remind you that you are confirmed for the event!");
+
+                                Toast.makeText(this, "Notifications sent to all confirmed entrants.", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("notifyAllEntrants", "Error retrieving lottery details: " + e.getMessage());
+                                Toast.makeText(this, "Failed to load lottery details.", Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("notifyAllEntrants", "Error retrieving event details: " + e.getMessage());
+                    Toast.makeText(this, "Failed to load event details.", Toast.LENGTH_SHORT).show();
+                });
+    }
+
 }

@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:background="#F9F9F9">
 
-    <ImageView
-        android:id="@+id/ivClose"
+    <!-- Back Button -->
+    <TextView
+        android:id="@+id/tvBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:text="← Back"
+        android:textColor="#5DB075"
+        android:textSize="16sp"
+        android:padding="8dp"
         android:layout_margin="16dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:clickable="true"
+        android:focusable="true" />
 
+    <!-- Title -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
@@ -22,116 +28,135 @@
         android:text="List Event"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="@android:color/black"
+        android:textColor="#333333"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tvBack"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        app:layout_constraintHorizontal_bias="0.5" />
 
-    <ImageView
-        android:id="@+id/ivAddImage"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@android:drawable/ic_menu_add"
-        android:layout_marginTop="32dp"
+    <!-- ScrollView to contain the content -->
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintBottom_toTopOf="@id/btnListEvent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <EditText
-        android:id="@+id/etEventName"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Event Name"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="32dp"
-        android:padding="12dp"
-        android:background="@android:color/darker_gray"
-        app:layout_constraintTop_toBottomOf="@id/ivAddImage"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <!-- Inner layout for the form content -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp">
 
-    <EditText
-        android:id="@+id/etEventDate"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Event Date"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="16dp"
-        android:padding="12dp"
-        android:background="@android:color/darker_gray"
-        app:layout_constraintTop_toBottomOf="@id/etEventName"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+            <!-- Event Image -->
+            <ImageView
+                android:id="@+id/ivEventImage"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="Event Image"
+                android:scaleType="centerCrop"
+                android:background="#E0E0E0" />
 
-    <EditText
-        android:id="@+id/etLastDateRegistration"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Last Date for Registration"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="16dp"
-        android:padding="12dp"
-        android:background="@android:color/darker_gray"
-        app:layout_constraintTop_toBottomOf="@id/etEventDate"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+            <!-- Add Image Button -->
+            <Button
+                android:id="@+id/btnAddImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Choose Image"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:backgroundTint="#5DB075"
+                android:layout_marginTop="8dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:layout_gravity="center_horizontal" />
 
-    <EditText
-        android:id="@+id/etVacancy"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Vacancy"
-        android:inputType="number"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="16dp"
-        android:padding="12dp"
-        android:background="@android:color/darker_gray"
-        app:layout_constraintTop_toBottomOf="@id/etLastDateRegistration"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+            <!-- Event Name -->
+            <EditText
+                android:id="@+id/etEventName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Event Name"
+                android:layout_marginTop="24dp"
+                android:padding="12dp"
+                android:background="#DDDDDD" />
 
-    <EditText
-        android:id="@+id/etWaitlistLimit"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Max Waitlist Entrants (optional)"
-        android:inputType="number"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="16dp"
-        android:padding="12dp"
-        android:background="@android:color/darker_gray"
-        app:layout_constraintTop_toBottomOf="@id/etVacancy"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+            <!-- Event Date -->
+            <EditText
+                android:id="@+id/etEventDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Event Date"
+                android:layout_marginTop="16dp"
+                android:padding="12dp"
+                android:background="#DDDDDD" />
 
-    <CheckBox
-        android:id="@+id/cbGeolocationRequired"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Require Geolocation for Joining"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/etWaitlistLimit"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+            <!-- Last Date for Registration -->
+            <EditText
+                android:id="@+id/etLastDateRegistration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Last Date for Registration"
+                android:layout_marginTop="16dp"
+                android:padding="12dp"
+                android:background="#DDDDDD" />
 
-    <CheckBox
-        android:id="@+id/cbNotification"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Receive notification when someone signs up"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/cbGeolocationRequired"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+            <!-- Vacancy -->
+            <EditText
+                android:id="@+id/etVacancy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Vacancy"
+                android:inputType="number"
+                android:layout_marginTop="16dp"
+                android:padding="12dp"
+                android:background="#DDDDDD" />
 
+            <!-- Waitlist Limit -->
+            <EditText
+                android:id="@+id/etWaitlistLimit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Max Waitlist Entrants (optional)"
+                android:inputType="number"
+                android:layout_marginTop="16dp"
+                android:padding="12dp"
+                android:background="#DDDDDD" />
+
+            <!-- Geolocation Checkbox -->
+            <CheckBox
+                android:id="@+id/cbGeolocationRequired"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Require Geolocation for Joining"
+                android:layout_marginTop="16dp" />
+
+            <!-- Notification Checkbox -->
+            <CheckBox
+                android:id="@+id/cbNotification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Receive notification when someone signs up"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="24dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- List Event Button -->
     <Button
         android:id="@+id/btnListEvent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="List Event"
+        android:textStyle="bold"
         android:backgroundTint="#5DB075"
         android:textColor="@android:color/white"
         android:layout_marginHorizontal="24dp"
