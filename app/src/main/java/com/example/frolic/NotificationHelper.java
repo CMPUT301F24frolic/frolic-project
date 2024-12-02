@@ -118,8 +118,6 @@ public class NotificationHelper {
                                 String message = notif.get("Message");
 
                                 if (title != null && message != null) {
-                                    NotificationStorageHelper.saveNotification(context, deviceId, title, message);
-
                                     displayNotification(context, title, message);
                                 }
                             }
