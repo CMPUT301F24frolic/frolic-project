@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,12 +27,13 @@ public class ChosenEntrantsActivity extends AppCompatActivity {
 
     private TextView tvBack, tvTitle, tvChosenListCount;
     private RecyclerView rvEntrants;
-    private EntrantsAdapter adapter;
-    private ArrayList<String> chosenEntrantIds;
-    private Button btnNotifyAllEntrants;
     private FirebaseFirestore db;
+    private EntrantsAdapter adapter;
     private String eventId;
+    private ArrayList<String> chosenEntrantIds, canceledListIds;
+    private Button btnNotifyAllEntrants;
     private NotificationHelper notificationHelper;
+
 
     /**
      * Initializes the activity, sets up the UI components, retrieves the chosen entrant IDs from
@@ -43,11 +45,11 @@ public class ChosenEntrantsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chosen_entrants_screen);
+        db = FirebaseFirestore.getInstance();
 
         Intent intent = getIntent();
         chosenEntrantIds = intent.getStringArrayListExtra("entrantList");
-
-        db = FirebaseFirestore.getInstance();
+        canceledListIds = intent.getStringArrayListExtra("canceledList");
         eventId = intent.getStringExtra("eventId");
         notificationHelper = new NotificationHelper();
 
@@ -58,8 +60,12 @@ public class ChosenEntrantsActivity extends AppCompatActivity {
         btnNotifyAllEntrants = findViewById(R.id.btnNotifyAllEntrants);
 
         rvEntrants.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new EntrantsAdapter(chosenEntrantIds);
+        adapter = new EntrantsAdapter(chosenEntrantIds, true);
         rvEntrants.setAdapter(adapter);
+        adapter.setOnItemClickListener((parent, view, position, id) -> {
+            String entrantId = chosenEntrantIds.get(position);
+            showEntrantDialog(entrantId);
+        });
 
         updateCountDisplay();
 
@@ -69,7 +75,6 @@ public class ChosenEntrantsActivity extends AppCompatActivity {
             Toast.makeText(this, "No entrants in the chosen list.", Toast.LENGTH_SHORT).show();
         }
 
-        // Set up notification sending
         btnNotifyAllEntrants.setOnClickListener(v -> notifyAllChosen());
     }
 
@@ -83,6 +88,70 @@ public class ChosenEntrantsActivity extends AppCompatActivity {
         } else {
             tvChosenListCount.setText("0");
         }
+    }
+
+    /**
+     * Show a dialog with entrant details and options.
+     *
+     * @param entrantId The ID of the entrant clicked
+     */
+    private void showEntrantDialog(String entrantId) {
+        db.collection("entrants").document(entrantId).get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                String name = documentSnapshot.getString("name");
+                String email = documentSnapshot.getString("email");
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Entrant Details");
+                builder.setMessage("Name: " + name + "\nEmail: " + email);
+                builder.setPositiveButton("Cancel from Invited List", (dialog, which) -> showCancellationConfirmation(entrantId));
+                builder.setNegativeButton("Go Back", (dialog, which) -> dialog.dismiss());
+                builder.show();
+            } else {
+                Toast.makeText(this, "Entrant details not found.", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(e -> Toast.makeText(this, "Error loading entrant details.", Toast.LENGTH_SHORT).show());
+    }
+
+    /**
+     * Show a confirmation dialog for cancellation.
+     *
+     * @param entrantId The ID of the entrant to cancel
+     */
+    private void showCancellationConfirmation(String entrantId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirm Cancellation");
+        builder.setMessage("Are you sure you want to remove this entrant from the Invited List?");
+        builder.setPositiveButton("Yes", (dialog, which) -> cancelEntrantFromChosenList(entrantId));
+        builder.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    /**
+     * Cancel an entrant from the chosen List, update Firestore, and refresh UI.
+     *
+     * @param entrantId The ID of the entrant to cancel
+     */
+    private void cancelEntrantFromChosenList(String entrantId) {
+        chosenEntrantIds.remove(entrantId);
+        canceledListIds.add(entrantId);
+
+        db.collection("lotteries").document(eventId)
+                .update("invitedListIds", chosenEntrantIds)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Entrant removed from waitlist.", Toast.LENGTH_SHORT).show();
+                    adapter.notifyDataSetChanged();
+                    updateCountDisplay();
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to update waitlist.", Toast.LENGTH_SHORT).show());
+
+        db.collection("lotteries").document(eventId)
+                .update("canceledListIds", canceledListIds)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Entrant removed from waitlist.", Toast.LENGTH_SHORT).show();
+                    updateCountDisplay();
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to update waitlist.", Toast.LENGTH_SHORT).show());
     }
 
     /**
@@ -130,8 +199,6 @@ public class ChosenEntrantsActivity extends AppCompatActivity {
                     Log.e("notifyAllEntrants", "Error retrieving event details: " + e.getMessage());
                     Toast.makeText(this, "Failed to load event details.", Toast.LENGTH_SHORT).show();
                 });
-
-
     }
 
     /**
@@ -150,7 +217,6 @@ public class ChosenEntrantsActivity extends AppCompatActivity {
                     body
             );
         }
-
         Log.d("sendNotifications", "Notifications sent to: " + recipientIds);
     }
 }

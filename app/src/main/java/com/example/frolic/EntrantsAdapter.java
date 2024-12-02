@@ -1,27 +1,31 @@
 package com.example.frolic;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Source;
+
 import java.util.ArrayList;
 
 /**
  * Adapter class for displaying entrant details in a RecyclerView. This adapter
  * retrieves entrant information, including name and email, from Firestore using
  * a list of entrant IDs.
- * Used in the Organizer's view of entrants in their event
  */
 public class EntrantsAdapter extends RecyclerView.Adapter<EntrantsAdapter.EntrantViewHolder> {
 
     private ArrayList<String> entrantIds;
     private FirebaseFirestore db;
+    private AdapterView.OnItemClickListener listener;
+    private boolean isClickable = false; // Defaults to non-clickable
 
     /**
      * Constructs an EntrantsAdapter with a list of entrant IDs.
@@ -32,6 +36,27 @@ public class EntrantsAdapter extends RecyclerView.Adapter<EntrantsAdapter.Entran
     public EntrantsAdapter(ArrayList<String> entrantIds) {
         this.entrantIds = entrantIds;
         this.db = FirebaseFirestore.getInstance();
+    }
+
+    /**
+     * Constructs an EntrantsAdapter with a list of entrant IDs and a flag to control clickability.
+     *
+     * @param entrantIds List of entrant IDs used to query Firestore for entrant details
+     * @param isClickable Flag to enable or disable click events for the items
+     */
+    public EntrantsAdapter(ArrayList<String> entrantIds, boolean isClickable) {
+        this.entrantIds = entrantIds;
+        this.db = FirebaseFirestore.getInstance();
+        this.isClickable = isClickable;
+    }
+
+    /**
+     * Sets a click listener for the adapter.
+     * @param listener  The listener provides the clicked item's position and view in the callback.
+     */
+
+    public void setOnItemClickListener(AdapterView.OnItemClickListener listener) {
+        this.listener = listener;
     }
 
     /**
@@ -77,6 +102,13 @@ public class EntrantsAdapter extends RecyclerView.Adapter<EntrantsAdapter.Entran
             holder.tvEntrantName.setText("Error loading");
             holder.tvEntrantEmail.setText("Error loading email");
         });
+
+        // Set click listener only if the adapter is clickable
+        if (isClickable && listener != null) {
+            holder.itemView.setOnClickListener(v -> listener.onItemClick(null, v, position, 0));
+        } else {
+            holder.itemView.setOnClickListener(null); // Remove click listener
+        }
     }
 
     /**

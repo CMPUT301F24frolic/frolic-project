@@ -91,6 +91,12 @@ public class EntrantDetailsActivity extends AppCompatActivity {
         btnNotifyAllEntrants.setOnClickListener(v -> notifyAllEntrants());
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Reload data from Firestore to ensure the lists are updated
+        loadEntrantDetails();
+    }
 
     /**
      * Picks the entrants from the Firebase document and removes them from the waiting list.
@@ -269,12 +275,14 @@ public class EntrantDetailsActivity extends AppCompatActivity {
             intent = new Intent(this, WaitingListActivity.class);
             intent.putExtra("eventId", eventId);
             intent.putStringArrayListExtra("entrantList", waitingListIds);
+            intent.putStringArrayListExtra("canceledList", canceledListIds);
             startActivity(intent);
             return true;
         } else if (itemId == R.id.filter_chosen) {
             intent = new Intent(this, ChosenEntrantsActivity.class);
             intent.putExtra("eventId", eventId);
             intent.putStringArrayListExtra("entrantList", chosenListIds);
+            intent.putStringArrayListExtra("canceledList", canceledListIds);
             startActivity(intent);
             return true;
         } else if (itemId == R.id.filter_canceled) {
