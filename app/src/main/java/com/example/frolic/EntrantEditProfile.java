@@ -130,6 +130,15 @@ public class EntrantEditProfile extends AppCompatActivity {
         }
     }
 
+                            Long phoneNumber = document.getLong("phoneNumber");
+                            if (phoneNumber != null) {
+                                if (phoneNumber == 0) {
+                                    etPhone.setText("");
+                                } else {
+                                    etPhone.setText(String.valueOf(phoneNumber));
+
+                                }
+                            }
     /**
      * Copies existing profile data from organizer profile when creating new entrant profile
      */
@@ -148,8 +157,15 @@ public class EntrantEditProfile extends AppCompatActivity {
             cbNotifications.setChecked(notifications);
         }
 
-        Boolean isAdmin = (Boolean) data.get("admin");
-        tvAdminStatus.setText(isAdmin != null && isAdmin ? "Admin Status: Yes" : "Admin Status: Regular User");
+        isAdmin = document.getBoolean("admin");
+        if (isAdmin == null) { // Default to false if null
+            isAdmin = false;
+        }
+        if (isAdmin) {
+            tvAdminStatus.setText("Admin Status: Yes");
+        } else {
+            tvAdminStatus.setText("Admin Status: Regular User");
+        }
 
         String base64Image = (String) data.get("profileImage");
         if (base64Image != null) {
@@ -255,7 +271,12 @@ public class EntrantEditProfile extends AppCompatActivity {
                         etEmail.setText(document.getString("email"));
                         Long phoneNumber = document.getLong("phoneNumber");
                         if (phoneNumber != null) {
-                            etPhone.setText(String.valueOf(phoneNumber));
+                            if(phoneNumber == 0) {
+                                etPhone.setText("");
+                            }
+                            else{
+                                etPhone.setText(String.valueOf(phoneNumber));
+                                }
                         }
 
                         String base64Image = document.getString("profileImage");
@@ -300,8 +321,6 @@ public class EntrantEditProfile extends AppCompatActivity {
                 return;
             }
         }
-
-        boolean isAdmin = getIntent().getBooleanExtra("isAdmin", false);
 
         Map<String, Object> userData = new HashMap<>();
         userData.put("deviceId", deviceId);
