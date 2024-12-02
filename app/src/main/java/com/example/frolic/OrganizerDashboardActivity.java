@@ -95,7 +95,6 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
     private void setupNavigationOptions() {
         TextView createEvents = findViewById(R.id.tvCreateEvents);
         TextView manageEvents = findViewById(R.id.tvManageEvents);
-        TextView notifications = findViewById(R.id.tvNotifications);
         TextView myProfile = findViewById(R.id.tvMyProfile);
 
 
@@ -110,12 +109,6 @@ public class OrganizerDashboardActivity extends AppCompatActivity {
             Intent intent = new Intent(this, ManageEventsActivity.class);
             intent.putExtra("deviceId", deviceId);
             startActivity(intent);
-        });
-
-        notifications.setOnClickListener(v -> {
-            // TODO: Navigate to notifications
-            // Intent intent = new Intent(this, OrganizerNotificationsActivity.class);
-            // startActivity(intent);
         });
 
         myProfile.setOnClickListener(v -> {
