@@ -1,14 +1,18 @@
 package com.example.frolic;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -16,16 +20,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -39,11 +46,14 @@ public class ListEventActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private EditText etEventName, etEventDate, etLastDateRegistration, etVacancy, etWaitlistLimit;
     private CheckBox cbGeolocationRequired, cbNotification;
-    private Button btnListEvent;
-    private String organizerId, facilityId;;
+    private Button btnListEvent, btnAddImage;
+    private String organizerId, facilityId;
 
     private Date eventDate;
     private Date enrollDate;
+
+    private ImageView ivEventImage;
+    private Uri selectedImageUri;
 
     /**
      * Initializes the activity and binds XML layout elements to variables for user interaction.
@@ -98,6 +108,13 @@ public class ListEventActivity extends AppCompatActivity {
 
         initializeDatePickers();
 
+        // Find views
+        btnAddImage = findViewById(R.id.btnAddImage);
+        ivEventImage = findViewById(R.id.ivEventImage);
+
+        // Set click listener to add image
+        btnAddImage.setOnClickListener(v -> checkPermissionAndPickImage());
+
         // Set up button click listener to capture input data
         btnListEvent.setOnClickListener(v -> {
             if (!btnListEvent.isEnabled()) {
@@ -109,8 +126,8 @@ public class ListEventActivity extends AppCompatActivity {
             }
         });
 
-        ImageView ivClose = findViewById(R.id.ivClose);
-        ivClose.setOnClickListener(v -> {
+        TextView tvBack = findViewById(R.id.tvBack);
+        tvBack.setOnClickListener(v -> {
             // Navigate back to the Organizer Dashboard
             Intent intent = new Intent(ListEventActivity.this, OrganizerDashboardActivity.class);
             intent.putExtra("deviceId", organizerId);
@@ -118,6 +135,53 @@ public class ListEventActivity extends AppCompatActivity {
             finish();
         });
     }
+
+    /**
+     * Checks for the necessary permissions to access media files based on the API level.
+     * If permissions are not granted, it requests them from the user.
+     * If permissions are granted, it opens the image picker.
+     */
+    private void checkPermissionAndPickImage() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_MEDIA_IMAGES}, 100);
+            } else {
+                pickImage();
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
+            } else {
+                pickImage();
+            }
+        }
+    }
+
+    /**
+     * Launches the image picker to allow the user to select an image from their gallery.
+     */
+    private void pickImage() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        imagePickerLauncher.launch(intent);
+    }
+
+    /**
+     * Handles the result of the image picker activity. If the user selects an image,
+     * it retrieves the URI of the selected image and displays it in the ImageView.
+     */
+    private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    selectedImageUri = result.getData().getData();
+                    ivEventImage.setImageURI(selectedImageUri);
+                }
+            }
+    );
 
     /**
      * Sets up the DatePicker for EventDate and EnrollDate fields. EventDate must be selected first,
@@ -166,7 +230,11 @@ public class ListEventActivity extends AppCompatActivity {
         // Create a hash of the event id which will be what the QR code is made from
         String QRCodeHash = String.valueOf(eventId.hashCode());
 
-        // Create the Event object
+        String imageBase64 = null;
+        if (selectedImageUri != null) {
+            imageBase64 = convertImageToBase64();
+        }
+
         Event event = new Event(
                 eventId,
                 organizerId,
@@ -178,18 +246,28 @@ public class ListEventActivity extends AppCompatActivity {
                 enrollDate,
                 geolocationRequired,
                 receiveNotification,
-                QRCodeHash
+                QRCodeHash,
+                imageBase64
         );
 
+
         // Save the event to Firestore
-        newEventRef.set(event.toMap())
+        saveEventToFirestore(event, newEventRef, eventId);
+    }
+
+    // Helper method to save event to Firestore
+    private void saveEventToFirestore(Event event, DocumentReference eventRef, String eventId) {
+        eventRef.set(event.toMap())
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Event created successfully!", Toast.LENGTH_SHORT).show();
+
                     // Add the event ID to the organizer's eventsOrganizing list
                     db.collection("organizers").document(organizerId)
                             .update("eventsOrganizing", FieldValue.arrayUnion(eventId))
                             .addOnSuccessListener(aVoid2 -> Log.d("OrganizerUpdate", "Event ID added to organizer's eventsOrganizing list"))
                             .addOnFailureListener(e -> Log.e("OrganizerUpdate", "Error adding event ID to organizer", e));
+
+                    // Initialize lottery system
                     initializeLotterySystem(event, eventId);
 
                     // Navigate back to the Organizer Dashboard
@@ -200,8 +278,21 @@ public class ListEventActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Error saving event.", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
+                    Log.e("EventSave", "Error saving event", e);
                 });
+    }
+
+    private String convertImageToBase64() {
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+            byte[] imageBytes = baos.toByteArray();
+            return Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        } catch (IOException e) {
+            Log.e("ImageConversion", "Error converting image to Base64", e);
+            return null;
+        }
     }
 
     /**

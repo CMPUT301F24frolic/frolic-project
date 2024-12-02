@@ -4,17 +4,23 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.firestore.DocumentReference;
@@ -36,6 +42,8 @@ public class EventDetailsActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String eventId;
     private boolean isGeolocationRequired = false;
+    private FrameLayout flEventImageContainer;
+    private ImageView ivEventImage;
     private NotificationHelper notificationHelper;
     private String organizerId;
 
@@ -62,6 +70,8 @@ public class EventDetailsActivity extends AppCompatActivity {
         btnJoin = findViewById(R.id.btnJoin);
         btnDecline = findViewById(R.id.btnDecline);
         btnBack = findViewById(R.id.btnBack);
+        flEventImageContainer = findViewById(R.id.flEventImageContainer);
+        ivEventImage = findViewById(R.id.ivEventImage);
 
         // Set up the back button to finish the activity and go back
         btnBack.setOnClickListener(v -> finish());
@@ -105,6 +115,31 @@ public class EventDetailsActivity extends AppCompatActivity {
                     btnLeave.setVisibility(View.GONE);
                     btnJoin.setVisibility(View.GONE);
                     btnDecline.setVisibility(View.GONE);
+
+                    String base64Image = event.getEventImageUrl();
+                    if (base64Image != null && !base64Image.trim().isEmpty()) {
+                        try {
+                            byte[] decodedBytes = Base64.decode(base64Image, Base64.DEFAULT);
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+
+                            if (bitmap != null) {
+                                ivEventImage.setImageBitmap(bitmap);
+                                // Show the image container
+                                flEventImageContainer.setVisibility(View.VISIBLE);
+                            } else {
+                                // Hide the image container if bitmap decoding fails
+                                flEventImageContainer.setVisibility(View.GONE);
+                            }
+                        } catch (IllegalArgumentException e) {
+                            // Handle invalid Base64 data
+                            Log.e(TAG, "Invalid Base64 image data", e);
+                            flEventImageContainer.setVisibility(View.GONE);
+                        }
+                    } else {
+                        // Hide the image container if no image is available
+                        flEventImageContainer.setVisibility(View.GONE);
+                    }
+
                     DocumentReference lotteryRef = db.collection("lotteries").document(eventId);
                     lotteryRef.get().addOnSuccessListener(documentSnapshot2 -> {
                         if (documentSnapshot2.exists()) {
