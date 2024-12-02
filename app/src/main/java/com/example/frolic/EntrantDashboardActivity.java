@@ -75,7 +75,6 @@ public class EntrantDashboardActivity extends AppCompatActivity {
     private void setupNavigationOptions() {
         TextView viewEvents = findViewById(R.id.tvViewEvents);
         TextView myEvents = findViewById(R.id.tvMyEvents);
-        TextView notifications = findViewById(R.id.tvNotifications);
         TextView profile = findViewById(R.id.tvProfile);
         Button scanQR = findViewById(R.id.btnScanQR);
 
@@ -97,15 +96,6 @@ public class EntrantDashboardActivity extends AppCompatActivity {
             intent.putExtra("deviceId", getIntent().getStringExtra("deviceId"));  // Pass device ID if needed
             startActivity(intent);
 
-        });
-
-        notifications.setOnClickListener(v -> {
-            // TODO: Navigate to notifications
-            // Intent intent = new Intent(this, NotificationsActivity.class);
-            // startActivity(intent);
-            Intent intent = new Intent(this, NotificationsActivity.class);
-            intent.putExtra("deviceId", getIntent().getStringExtra("deviceId"));
-            startActivity(intent);
         });
 
         profile.setOnClickListener(v -> {
