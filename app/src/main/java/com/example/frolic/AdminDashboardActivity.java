@@ -18,6 +18,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String deviceId;
     private Button btnBack;
+    private TextView manageImages; // Added for Manage Images
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +46,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         TextView manageEvents = findViewById(R.id.tvManageEvents);
         TextView manageProfiles = findViewById(R.id.tvManageProfiles);
         TextView manageFacilities = findViewById(R.id.tvManageFacilities);
+        manageImages = findViewById(R.id.tvManageImages); // Initialize Manage Images TextView
         btnBack = findViewById(R.id.tvBack);
 
         btnBack.setOnClickListener(v -> {
@@ -71,9 +73,13 @@ public class AdminDashboardActivity extends AppCompatActivity {
             intent.putExtra("deviceId", deviceId);
             startActivity(intent);
         });
+
+        manageImages.setOnClickListener(v -> { // Handle Manage Images
+            Intent intent = new Intent(this, AdminImagesActivity.class);
+            intent.putExtra("deviceId", deviceId);
+            startActivity(intent);
+        });
     }
-
-
 
     /**
      * Verifies that the current user has admin privileges by checking the admin flag
